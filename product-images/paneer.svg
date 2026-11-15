@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 320" fill="none">
+  <defs>
+    <linearGradient id="plate" x1="84" y1="136" x2="312" y2="255" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff"/>
+      <stop offset="1" stop-color="#e7dfe7"/>
+    </linearGradient>
+    <linearGradient id="cheese" x1="142" y1="75" x2="268" y2="203" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fffef2"/>
+      <stop offset="1" stop-color="#eadfb8"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="201" cy="266" rx="126" ry="17" fill="#50335e" fill-opacity=".12"/>
+  <ellipse cx="200" cy="215" rx="132" ry="55" fill="url(#plate)" stroke="#d9cbd9" stroke-width="4"/>
+  <ellipse cx="200" cy="207" rx="102" ry="35" fill="#fffaf0"/>
+  <path d="m122 173 45-52 43 12-45 54-43-14Z" fill="#f3e8c8" stroke="#d8c99e" stroke-width="3" stroke-linejoin="round"/>
+  <path d="m167 187 45-54 42 13-44 56-43-15Z" fill="url(#cheese)" stroke="#d8c99e" stroke-width="3" stroke-linejoin="round"/>
+  <path d="m211 200 44-54 38 14-42 55-40-15Z" fill="#f8efda" stroke="#d8c99e" stroke-width="3" stroke-linejoin="round"/>
+  <path d="m146 218 43-53 40 14-42 55-41-16Z" fill="#fffdf0" stroke="#d8c99e" stroke-width="3" stroke-linejoin="round"/>
+  <path d="m190 231 43-54 41 13-42 56-42-15Z" fill="#f5ebd2" stroke="#d8c99e" stroke-width="3" stroke-linejoin="round"/>
+  <rect x="134" y="229" width="132" height="22" rx="11" fill="#70477d"/>
+  <text x="200" y="244" fill="#fff" font-family="Arial,sans-serif" font-size="12" font-weight="700" letter-spacing="2" text-anchor="middle">FRESH PANEER</text>
+</svg>

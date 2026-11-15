@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 320" fill="none">
+  <defs>
+    <linearGradient id="bottle" x1="143" y1="58" x2="255" y2="258" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff"/>
+      <stop offset="1" stop-color="#e9e1eb"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="200" cy="274" rx="82" ry="13" fill="#50335e" fill-opacity=".13"/>
+  <path d="M170 44h60v28l17 25v149a17 17 0 0 1-17 17h-60a17 17 0 0 1-17-17V97l17-25V44Z" fill="url(#bottle)" stroke="#d7cbd9" stroke-width="3"/>
+  <path d="M170 44h60v29h-60z" fill="#70477d"/>
+  <path d="M154 126h92v91h-92z" fill="#e9785e"/>
+  <path d="M164 140h72v61h-72z" fill="#fff8ed"/>
+  <circle cx="181" cy="159" r="8" fill="#edc96d"/>
+  <circle cx="217" cy="181" r="9" fill="#668d61"/>
+  <text x="200" y="174" fill="#50335e" font-family="Arial,sans-serif" font-size="11" font-weight="700" text-anchor="middle">COOL</text>
+  <text x="200" y="190" fill="#50335e" font-family="Arial,sans-serif" font-size="9" font-weight="700" letter-spacing="1" text-anchor="middle">DRINK</text>
+  <path d="M176 106h48" stroke="#fff" stroke-opacity=".8" stroke-width="4" stroke-linecap="round"/>
+</svg>

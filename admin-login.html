@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#70477d">
+  <meta name="description" content="Sign in to H.A.R.M Daily Needs shop administration.">
+  <title>Admin sign in | H.A.R.M Daily Needs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="admin-login.js" defer></script>
+</head>
+<body class="login-page">
+  <div class="login-shell">
+    <header class="login-header">
+      <a class="brand" href="/" aria-label="H.A.R.M Daily Needs home">
+        <img class="brand-mark" src="harm-mark.svg" alt="">
+        <span class="brand-copy"><strong>H.A.R.M</strong><small>DAILY NEEDS</small></span>
+      </a>
+      <a class="login-store-link" href="/">Visit storefront</a>
+    </header>
+    <main class="login-main">
+      <section class="login-card" aria-labelledby="login-title">
+        <span class="login-emblem" aria-hidden="true">H</span>
+        <div class="eyebrow"><span class="eyebrow-line"></span> SHOP OWNER ACCESS</div>
+        <h1 id="login-title">Welcome back.</h1>
+        <p class="login-intro">Sign in to manage your stock and daily sales.</p>
+        <form id="admin-login-form">
+          <label class="form-field" for="admin-username">Username
+            <input id="admin-username" name="username" autocomplete="username" required>
+          </label>
+          <label class="form-field" for="admin-password">Password
+            <input id="admin-password" name="password" type="password" autocomplete="current-password" required>
+          </label>
+          <p id="login-error" class="form-error login-error" role="alert" hidden></p>
+          <button id="login-button" class="primary-button login-submit" type="submit">Sign in to admin</button>
+        </form>
+        <p class="login-safety-note">Admin access is checked by the H.A.R.M server.</p>
+      </section>
+    </main>
+    <footer class="login-footer">H.A.R.M Daily Needs <span>·</span> Little things. Happier days.</footer>
+  </div>
+</body>
+</html>

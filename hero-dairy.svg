@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 520" fill="none">
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#f6f7ee"/>
+      <stop offset="1" stop-color="#e7eddf"/>
+    </linearGradient>
+    <linearGradient id="table" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#e4d1aa"/>
+      <stop offset="1" stop-color="#c5a77a"/>
+    </linearGradient>
+    <linearGradient id="bottle" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fff"/>
+      <stop offset=".58" stop-color="#f3f5ec"/>
+      <stop offset="1" stop-color="#dce6d5"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="13"/>
+      <feOffset dy="12"/>
+      <feComponentTransfer><feFuncA type="linear" slope=".18"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <path fill="url(#wall)" d="M0 0h1440v520H0z"/>
+  <path fill="#fff" fill-opacity=".26" d="M0 62h1440M0 135h1440M0 208h1440M0 281h1440M0 354h1440" stroke="#d8decf"/>
+  <path fill="url(#table)" d="M0 414c251-30 437-8 720-24 290-16 467-38 720 0v130H0z"/>
+  <path stroke="#b48b58" stroke-opacity=".35" d="M0 454c271-29 482-5 720-21 279-19 501-31 720-1M0 488c245-13 443-2 720-15 283-14 495-23 720-2"/>
+
+  <g opacity=".95">
+    <path stroke="#5d8044" stroke-width="12" stroke-linecap="round" d="M98 0c28 101 34 180 14 287M148 0c-4 86-25 148-66 207"/>
+    <path fill="#668d48" d="M101 127C35 112 13 77 19 39c54 4 86 31 82 88ZM116 187c66-45 102-39 121-10-25 43-72 60-121 10ZM89 89C50 47 48 16 67 1c40 19 54 48 22 88Z"/>
+    <path fill="#87a765" d="M82 200c-51-2-75-30-65-62 41 2 69 22 65 62Z"/>
+  </g>
+  <g opacity=".9" transform="translate(1170 5)">
+    <path stroke="#5d8044" stroke-width="11" stroke-linecap="round" d="M124 0c-20 92-17 172 20 279m-79-244c48 57 77 103 91 169"/>
+    <path fill="#668d48" d="M134 115C67 96 50 62 65 24c51 9 78 40 69 91ZM159 178c53-43 90-36 106-6-25 42-69 56-106 6Z"/>
+    <path fill="#87a765" d="M150 220c-37-37-37-66-14-82 32 19 44 44 14 82Z"/>
+  </g>
+
+  <g filter="url(#shadow)" transform="translate(262 143)">
+    <path fill="url(#bottle)" stroke="#d5ddcf" stroke-width="4" d="M74 0h108v38l30 35v238a18 18 0 0 1-18 18H62a18 18 0 0 1-18-18V73l30-35z"/>
+    <path fill="#9a72a3" d="M74 0h108v38H74z"/>
+    <path fill="#70477d" d="M65 103h126v134H65z"/>
+    <path fill="#f4eaf3" d="M80 119h96v99H80z"/>
+    <path fill="#799957" d="M117 185c13-23 27-26 40-4-7 18-29 28-40 4Z"/>
+    <path stroke="#9bb68a" stroke-width="4" stroke-linecap="round" d="M132 185c-2-16 2-27 11-36m-10 30-14-14m14 8 13-12"/>
+    <text x="128" y="146" fill="#50335e" font-family="Arial,sans-serif" font-size="12" font-weight="700" text-anchor="middle">FRESH</text>
+    <text x="128" y="162" fill="#50335e" font-family="Arial,sans-serif" font-size="12" font-weight="700" text-anchor="middle">DAILY MILK</text>
+    <path fill="#dfebe0" d="M95 267h66v15H95z"/>
+  </g>
+
+  <g filter="url(#shadow)" transform="translate(592 286)">
+    <path fill="#f7f4e9" stroke="#d6d5c9" stroke-width="4" d="M24 28h145l17 18v117H24z"/>
+    <path fill="#e9785e" d="M24 28h145v25H24z"/>
+    <path fill="#fcfbf5" d="M48 72h99v63H48z"/>
+    <path stroke="#afbd9e" stroke-width="3" d="M62 88h70m-70 13h70m-70 13h45"/>
+    <path fill="#ecbb59" d="M99 130c10-21 25-18 28 0-5 15-22 20-28 0Z"/>
+  </g>
+
+  <g filter="url(#shadow)" transform="translate(1004 287)">
+    <path fill="#fff" fill-opacity=".82" stroke="#d8dfd3" stroke-width="4" d="M27 16h125l-13 157H42z"/>
+    <path fill="#70477d" d="M34 65h112l-3 36H37z"/>
+    <path stroke="#fff" stroke-opacity=".75" stroke-width="6" d="M55 114h69"/>
+    <path stroke="#d5e0d1" stroke-width="3" d="M66 125h48"/>
+    <ellipse cx="89" cy="16" fill="#fff" fill-opacity=".9" rx="62" ry="15"/>
+  </g>
+
+  <g filter="url(#shadow)" transform="translate(1213 352)">
+    <circle cx="76" cy="67" r="63" fill="#e9e9d8"/>
+    <circle cx="76" cy="67" r="48" fill="#fffef7"/>
+    <circle cx="76" cy="67" r="36" fill="#f7f4e8"/>
+    <path fill="#f1c95c" d="M59 57c5-14 28-14 34 0-5 20-11 30-17 30s-12-10-17-30Z"/>
+    <path stroke="#fff" stroke-width="5" d="M66 58c2-7 16-9 21-1"/>
+  </g>
+
+  <g filter="url(#shadow)" transform="translate(470 406)">
+    <circle cx="56" cy="45" r="45" fill="#d97843"/>
+    <circle cx="56" cy="45" r="34" fill="#efaa52"/>
+    <path fill="#64844a" d="M51 12C45 0 51-4 57 5c7-11 12-8 9 1 11-7 15-2 7 4 12 1 11 7 0 8Z"/>
+  </g>
+</svg>
