@@ -294,7 +294,7 @@ export function OwnerDashboard() {
   return <main className={`owner-app ${darkMode ? "owner-dark" : ""}`}>
     <aside className={`owner-sidebar ${sidebarOpen ? "sidebar-open" : ""}`}>
       <a className="owner-logo" href="/"><span className="owner-logo-mark">H<span>.</span></span><span><strong>H.A.R.M</strong><small>OWNER STUDIO</small></span></a>
-      <div className="sidebar-shop-card"><span className="shop-avatar">H</span><span><strong>Daily Needs</strong><small>Bachupally, Hyderabad</small></span><ChevronDown size={15} /></div>
+      <div className="sidebar-shop-card"><span className="shop-avatar">H</span><span><strong>Daily Needs</strong><small>Bandlaguda Jagir, Hyderabad</small></span><ChevronDown size={15} /></div>
       <span className="sidebar-label">WORKSPACE</span>
       <nav className="dashboard-nav" aria-label="Owner dashboard">
         {tabs.map(({ name, icon: Icon }) => <button key={name} className={tab === name ? "dashboard-nav-active" : ""} onClick={() => { setTab(name); setSidebarOpen(false); }}><Icon size={17} />{name}{name === "Inventory" && totals.lowStock.length > 0 && <span className="nav-alert-count">{totals.lowStock.length}</span>}</button>)}

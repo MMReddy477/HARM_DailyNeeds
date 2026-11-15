@@ -7,14 +7,14 @@ const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope", displa
 
 export const metadata: Metadata = {
   title: "H.A.R.M Daily Needs | Your Friendly Neighbourhood Shop",
-  description: "Stationery, printing, gifts, recharges and trusted everyday services in Bachupally, Hyderabad.",
+  description: "Stationery, printing, gifts, recharges and trusted everyday services in Bandlaguda Jagir, Hyderabad.",
   applicationName: "H.A.R.M Daily Needs",
-  keywords: ["stationery", "printing", "Xerox", "Bachupally", "Hyderabad", "gifts", "money transfer"],
+  keywords: ["stationery", "printing", "Xerox", "Bandlaguda Jagir", "Hyderabad", "gifts", "money transfer"],
   manifest: "/manifest.webmanifest",
   icons: { icon: "/icon.svg" },
   openGraph: {
     title: "H.A.R.M Daily Needs",
-    description: "Your friendly neighbourhood shop for everyday needs in Bachupally, Hyderabad.",
+    description: "Your friendly neighbourhood shop for everyday needs in Bandlaguda Jagir, Hyderabad.",
     type: "website"
   }
 };

@@ -1,6 +1,6 @@
 # H.A.R.M Daily Needs
 
-A responsive Next.js 15 storefront and private owner workspace for H.A.R.M Daily Needs in Bachupally, Hyderabad. The public website has service discovery, stationery product highlights without public prices, a WhatsApp call to action, contact details, and responsive navigation. `/owner-login` is the only owner-login link; `/admin` and its data API require a signed, HTTP-only session.
+A responsive Next.js 15 storefront and private owner workspace for H.A.R.M Daily Needs at 2-2/30/201, My ABode The Sirius, Suryodhaya Colony, Bandlaguda Jagir, Hyderabad. The public website has service discovery, stationery product highlights without public prices, a WhatsApp call to action, contact details, and responsive navigation. `/owner-login` is the only owner-login link; `/admin` and its data API require a signed, HTTP-only session.
 
 ## Run locally
 
@@ -39,7 +39,7 @@ Open [http://localhost:3000](http://localhost:3000), use [http://localhost:3000/
 
 - Replace the example WhatsApp number in `.env.local` with the business number.
 - Add the real phone number before publishing. The provided `+91 XXXXXXXXXX` is only a placeholder.
-- The location map points to Bachupally, Hyderabad; update it to the shop’s exact address when available.
+- The location map and public contact details use 2-2/30/201, My ABode The Sirius, Suryodhaya Colony, Bandlaguda Jagir, Hyderabad.
 - The homepage currently features the family photo provided by the owner at `public/family-welcome.jpeg`. It is publicly visible. Replace/remove it if publication permission changes.
 - Product/gallery art is illustrative, not a photograph of the physical store. Use real shop and product images when available.
 - No customer reviews are fabricated. Invite customers to share genuine feedback before adding testimonials.

@@ -19,6 +19,9 @@ const contactSchema = z.object({
 });
 type ContactValues = z.infer<typeof contactSchema>;
 
+const shopAddress = "2-2/30/201, My ABode The Sirius, Suryodhaya Colony, Bandlaguda Jagir, Hyderabad";
+const shopArea = "Bandlaguda Jagir, Hyderabad";
+
 const services = [
   { icon: BookOpen, title: "Stationery", copy: "School and office essentials, books, pens, files and art supplies.", tag: "For every idea", color: "lavender" },
   { icon: Printer, title: "Print & Xerox", copy: "Black-and-white and color copies, printouts, scanning and lamination.", tag: "Quick turnaround", color: "peach" },
@@ -83,7 +86,7 @@ export function Storefront() {
     <main>
       <div className="topline">
         <div className="section-shell topline-inner">
-          <span><MapPin size={14} /> Bachupally, Hyderabad</span>
+          <span><MapPin size={14} /> {shopArea}</span>
           <span><Clock3 size={14} /> Open daily · Visit us today</span>
           <a href="mailto:harmdailyneeds@gmail.com"><MessageCircle size={14} /> We’re happy to help</a>
         </div>
@@ -114,7 +117,7 @@ export function Storefront() {
             <span className="hero-kicker"><span className="kicker-star">✦</span> YOUR FRIENDLY NEIGHBOURHOOD SHOP</span>
             <h1>H.A.R.M DAILY NEEDS<span className="hero-period">.</span></h1>
             <h2>Everything you need <span className="gradient-text">under one roof.</span></h2>
-            <p>From stationery and printing to gifts and everyday services, we’re here for families, students, offices and local businesses in Bachupally.</p>
+            <p>From stationery and printing to gifts and everyday services, we’re here for families, students, offices and local businesses in Bandlaguda Jagir.</p>
             <div className="hero-buttons">
               <a className="button-primary" href="#services">Explore our services <ArrowRight size={17} /></a>
               <a className="button-quiet" href="#contact"><Phone size={16} /> Get in touch</a>
@@ -189,10 +192,10 @@ export function Storefront() {
 
       <section id="contact" className="section-shell section-pad contact-section">
         <div className="contact-copy"><span className="eyebrow">COME ON OVER</span><h2 className="section-title">Your neighbourhood<br /><span className="gradient-text">shop is right here.</span></h2><p className="section-lead">Stop by for your everyday needs. We’re looking forward to seeing you.</p>
-          <div className="contact-details"><div><span className="contact-icon"><MapPin /></span><span><small>FIND OUR SHOP</small><strong>Bachupally, Hyderabad</strong></span></div><div><span className="contact-icon"><Phone /></span><span><small>GIVE US A CALL</small><strong>Phone number to be added</strong></span></div><div><span className="contact-icon"><MessageCircle /></span><span><small>SEND AN EMAIL</small><strong>harmdailyneeds@gmail.com</strong></span></div><div><span className="contact-icon"><Clock3 /></span><span><small>WHEN TO VISIT</small><strong>Open daily</strong></span></div></div>
+          <div className="contact-details"><div><span className="contact-icon"><MapPin /></span><span><small>FIND OUR SHOP</small><strong>{shopAddress}</strong></span></div><div><span className="contact-icon"><Phone /></span><span><small>GIVE US A CALL</small><strong>Phone number to be added</strong></span></div><div><span className="contact-icon"><MessageCircle /></span><span><small>SEND AN EMAIL</small><strong>harmdailyneeds@gmail.com</strong></span></div><div><span className="contact-icon"><Clock3 /></span><span><small>WHEN TO VISIT</small><strong>Open daily</strong></span></div></div>
           <a className="button-primary contact-email" href="mailto:harmdailyneeds@gmail.com">Send us an email <ArrowRight size={17} /></a>
         </div>
-        <div className="map-card"><iframe title="Map showing Bachupally, Hyderabad" src="https://maps.google.com/maps?q=Bachupally%2C%20Hyderabad&t=&z=13&ie=UTF8&iwloc=&output=embed" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /><div className="map-label"><MapPin size={18} /><span><strong>H.A.R.M DAILY NEEDS</strong><small>Bachupally, Hyderabad</small></span></div></div>
+        <div className="map-card"><iframe title={`Map showing ${shopAddress}`} src={`https://maps.google.com/maps?q=${encodeURIComponent(shopAddress)}&t=&z=16&ie=UTF8&iwloc=&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" /><div className="map-label"><MapPin size={18} /><span><strong>H.A.R.M DAILY NEEDS</strong><small>{shopAddress}</small></span></div></div>
         <form className="contact-form" onSubmit={sendContact}>
           <div><span className="eyebrow">SEND A QUICK ENQUIRY</span><h3>How can we help?</h3><p>Your email app will open with your message ready to send.</p></div>
           <div className="contact-form-fields"><label>Your name<input {...contactForm.register("name")} placeholder="Name" />{contactForm.formState.errors.name && <small>{contactForm.formState.errors.name.message}</small>}</label><label>Phone (optional)<input {...contactForm.register("phone")} placeholder="Phone number" /></label><label className="contact-message-field">What do you need?<textarea {...contactForm.register("message")} rows={3} placeholder="Stationery, printing, or another enquiry..." />{contactForm.formState.errors.message && <small>{contactForm.formState.errors.message.message}</small>}</label><button className="button-primary" type="submit">Prepare email <ArrowRight size={16} /></button>{contactSent && <span className="contact-form-note">Email draft prepared. Send it from your email app.</span>}</div>
@@ -200,7 +203,7 @@ export function Storefront() {
       </section>
 
       <footer className="site-footer">
-        <div className="section-shell footer-main"><div className="footer-brand"><Link className="logo-lockup" href="/"><span className="logo-mark footer-logo-mark">H<span>.</span></span><span><strong>H.A.R.M</strong><small>DAILY NEEDS</small></span></Link><p>Your friendly neighbourhood shop for everyday needs in Bachupally, Hyderabad.</p><WhatsAppLink className="footer-social"><MessageCircle size={17} /> Chat with us</WhatsAppLink></div><div className="footer-links"><h3>Explore</h3><a href="#home">Home</a><a href="#services">Our services</a><a href="#products">Stationery</a><a href="#gallery">Gallery</a></div><div className="footer-links"><h3>Everyday help</h3><a href="#services">Print & Xerox</a><a href="#services">Gifts & toys</a><a href="#services">Money transfer</a><a href="#contact">Contact us</a></div><div className="footer-contact"><h3>Drop by</h3><p><MapPin size={15} /> Bachupally, Hyderabad</p><p><MessageCircle size={15} /> harmdailyneeds@gmail.com</p><p><Clock3 size={15} /> Open daily</p></div></div>
+        <div className="section-shell footer-main"><div className="footer-brand"><Link className="logo-lockup" href="/"><span className="logo-mark footer-logo-mark">H<span>.</span></span><span><strong>H.A.R.M</strong><small>DAILY NEEDS</small></span></Link><p>Your friendly neighbourhood shop for everyday needs in {shopArea}.</p><WhatsAppLink className="footer-social"><MessageCircle size={17} /> Chat with us</WhatsAppLink></div><div className="footer-links"><h3>Explore</h3><a href="#home">Home</a><a href="#services">Our services</a><a href="#products">Stationery</a><a href="#gallery">Gallery</a></div><div className="footer-links"><h3>Everyday help</h3><a href="#services">Print & Xerox</a><a href="#services">Gifts & toys</a><a href="#services">Money transfer</a><a href="#contact">Contact us</a></div><div className="footer-contact"><h3>Drop by</h3><p><MapPin size={15} /> {shopArea}</p><p><MessageCircle size={15} /> harmdailyneeds@gmail.com</p><p><Clock3 size={15} /> Open daily</p></div></div>
         <div className="section-shell footer-bottom"><span>© {new Date().getFullYear()} H.A.R.M Daily Needs. All rights reserved.</span><span>Made for everyday moments <Heart size={13} fill="currentColor" /></span></div>
       </footer>
     </main>
