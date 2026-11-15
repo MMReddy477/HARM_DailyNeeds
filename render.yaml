@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: harm-daily-needs
+    runtime: node
+    plan: free
+    branch: main
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: HARM_ADMIN_USERNAME
+        sync: false
+      - key: HARM_ADMIN_PASSWORD
+        sync: false
+      - key: HARM_SESSION_SECRET
+        generateValue: true
+      - key: NEXT_PUBLIC_WHATSAPP_NUMBER
+        sync: false
