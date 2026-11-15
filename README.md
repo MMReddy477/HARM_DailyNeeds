@@ -29,7 +29,7 @@ Open [http://localhost:3000](http://localhost:3000), use [http://localhost:3000/
 
 ## Deploy on Render
 
-The Render Blueprint is defined in `render.yaml`. Commit and push this file to the repository's `main` branch, then in Render choose **New → Blueprint** and select this repository. Render will create the web service using `npm ci`, `npm run build`, and `npm start`.
+The Render Blueprint is defined in `render.yaml`. Commit and push this file to the repository's `main` branch, then in Render choose **New → Blueprint** and select this repository. Render will create the web service using `npm install && npm run build` as the build command and `npm start` as the start command.
 
 Before deploying, add the following private environment variables to the Render service: `MONGODB_URI`, `HARM_ADMIN_USERNAME`, and `HARM_ADMIN_PASSWORD`. The Blueprint generates `HARM_SESSION_SECRET`; set `NEXT_PUBLIC_WHATSAPP_NUMBER` to the shop number using digits only. Configure the MongoDB Atlas network access rules to allow connections from the deployed service. Never put secret values in `render.yaml` or commit `.env.local`.
 
