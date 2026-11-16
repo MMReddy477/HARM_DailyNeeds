@@ -86,10 +86,7 @@ export function Storefront() {
 
       <FloatingContact address={shopAddress} />
 
-      <footer id="contact" className="site-footer">
-        <div className="section-shell footer-main"><div className="footer-brand"><Link className="logo-lockup" href="/"><span className="logo-mark footer-logo-mark">H<span>.</span></span><span><strong>H.A.R</strong><small>DAILY NEEDS</small></span></Link><p>Your friendly neighbourhood shop for everyday needs in {shopArea}.</p><WhatsAppLink className="footer-social"><MessageCircle size={17} /> Chat with us</WhatsAppLink></div><div className="footer-links"><h3>Explore</h3><a href="#home">Home</a><a href="/shop">Shop all</a><a href="/shop?department=school-supplies">Stationery</a></div><div className="footer-links"><h3>Everyday help</h3><a href="/shop?department=print-xerox">Print & Xerox</a><a href="/shop?department=gift-items">Gifts & toys</a><a href="/shop?department=money-transfer">Money transfer</a><a href="#contact">Contact us</a></div><div className="footer-contact"><h3>Drop by</h3><p><MapPin size={15} /> {shopAddress}</p><p><MessageCircle size={15} /> harmdailyneeds@gmail.com</p><p><Clock3 size={15} /> Open daily</p></div></div>
-        <div className="section-shell footer-bottom"><span>© {new Date().getFullYear()} H.A.R Daily Needs. All rights reserved.</span><span>Made for everyday moments <Heart size={13} fill="currentColor" /></span></div>
-      </footer>
+
     </main>
   );
 }

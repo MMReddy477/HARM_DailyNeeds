@@ -34,7 +34,7 @@ export function ShopNavigation({ mobileOpen = false, onNavigate }: { mobileOpen?
         </div>
       </div>;
     })}
-    <Link className="shop-home-link" href="/#contact" onClick={close}><Phone size={15}/>Contact</Link>
+    <Link className="shop-home-link" href="https://wa.me/918374778183" onClick={close}><Phone size={15}/>Contact</Link>
     <ProductSearch />
   </nav>;
 }

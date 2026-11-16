@@ -85,3 +85,5 @@ Local route checks require the server to be running. The review-flow integration
 Photo source URLs are recorded in `public/images/**/sources.json`, `additional-sources.json` and `service-sources.json`. Files in the project root belonging to the earlier static prototype are retained; `npm` runs the Next.js app.
 
 The public homepage no longer displays the Print & Xerox rate-card/calculator panel. Admin > Quick Rate Calculator now contains the Print & Stationery Counter, with selectable print and stationery/book rates, quantities, quote-only overrides and saved inventory price precedence. The multi-item calculator remains below it.
+
+The large purple homepage footer has been removed. Contact navigation and contact CTAs now open the shop WhatsApp link; Visit Store CTAs open address-based Google Maps directions, avoiding removed contact anchors.
