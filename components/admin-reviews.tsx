@@ -1,0 +1,13 @@
+"use client";
+import { useCallback, useEffect, useState } from "react";
+type Review = { id: string; name: string; text: string; rating: number; status: string; createdAt: string };
+export function AdminReviews() {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [filter, setFilter] = useState("pending");
+  const [message, setMessage] = useState("");
+  const [busy, setBusy] = useState(false);
+  const load = useCallback(async () => { setBusy(true); try { const r=await fetch('/api/admin/reviews',{cache:'no-store'});const d=await r.json();if(!r.ok)throw Error(d.message);setReviews(d.reviews); } catch(e) { setMessage(e instanceof Error ? e.message : 'Could not load reviews.'); } finally {setBusy(false);} }, []);
+  useEffect(() => {void load();}, [load]);
+  async function update(id:string,status:string) {setBusy(true);setMessage('');try{const r=await fetch('/api/admin/reviews',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,status})});const d=await r.json();if(!r.ok)throw Error(d.message);setReviews(current=>current.map(review=>review.id===id?{...review,status}:review));setMessage('Review '+status+'.');}catch(e){setMessage(e instanceof Error?e.message:'Update failed.');}finally{setBusy(false);}}
+  return <section className="dashboard-panel admin-reviews"><h2>Customer Reviews</h2><p>Approve genuine feedback to publish it. Reviews of every star rating can be approved; do not filter out feedback just because it is negative.</p><div className="admin-review-tools"><select aria-label="Review status" value={filter} onChange={e=>setFilter(e.target.value)}><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="all">All reviews</option></select><button type="button" disabled={busy} onClick={()=>void load()}>Refresh</button></div>{message&&<p role="status">{message}</p>}{busy&&<p>Working...</p>}{reviews.filter(r=>filter==='all'||r.status===filter).map(review=><article key={review.id}><div><strong>{review.name}</strong><span>{review.rating}/5 · {review.status}</span></div><p>{review.text}</p><small>{new Date(review.createdAt).toLocaleString('en-IN')}</small><div>{['approved','rejected','pending'].filter(s=>s!==review.status).map(status=><button type="button" key={status} disabled={busy} onClick={()=>void update(review.id,status)}>{status==='approved'?'Approve':status==='rejected'?'Reject':'Return to pending'}</button>)}</div></article>)}{!busy&&!reviews.some(r=>filter==='all'||r.status===filter)&&<p>No {filter==='all'?'':filter+' '}reviews yet.</p>}</section>;
+}

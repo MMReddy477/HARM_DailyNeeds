@@ -1,0 +1,40 @@
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
+const assert = require('node:assert/strict');
+const ts = require('typescript');
+const cache = new Map();
+function load(file) {
+  file = path.resolve(file);
+  if (cache.has(file)) return cache.get(file);
+  const module = { exports: {} };
+  cache.set(file, module.exports);
+  const code = ts.transpileModule(fs.readFileSync(file, 'utf8'), { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS } }).outputText;
+  vm.runInNewContext(code, { exports: module.exports, module, require: name => name.startsWith('@/') ? load(name.slice(2) + '.ts') : require(name) });
+  return module.exports;
+}
+const catalog = load('lib/product-search.ts');
+const { calculateQuote } = load('lib/rate-calculator.ts');
+const products = catalog.mergePublicProducts([]);
+assert(products.length > 200, 'Catalog unexpectedly empty or truncated');
+assert.equal(new Set(products.map(p => catalog.canonicalProductName(p.name))).size, products.length);
+for (const product of products) {
+  assert(product.name.trim(), 'Missing product name');
+  if (product.price !== null) assert(Number.isFinite(product.price) && product.price >= 0, product.name + ': invalid price');
+  if (product.image?.startsWith('/')) assert(fs.existsSync('public' + product.image), product.name + ': broken local photo');
+}
+for (const query of ['100', '172', '200', 'blue pen', 'black pen', 'marriage', 'housewarming', 'birthday', 'calculator']) assert(products.some(p => catalog.matchesProduct(p, query)), 'Missing search results: ' + query);
+for (const id of ['school-supplies', 'notebooks', 'office-supplies', 'gift-items', 'daily-needs']) assert(products.filter(p => p.departmentIds.includes(id)).length > 10, id + ' is empty');
+const saved = { key: 'test-admin-product', name: 'Couple Mug Set', department: 'Gift Items', id: 'gift-items', price: 420, unit: 'set', description: '', aliases: '', available: true };
+const overridden = catalog.mergePublicProducts([saved]).find(p => p.key === saved.key);
+assert.equal(overridden.price, 420);
+assert.equal(overridden.estimatedPrice, false);
+const total = calculateQuote([{ price: 10.15, quantity: 3 }, { price: 35, quantity: 2 }], 10);
+assert.equal(total.subtotal, 100.45);
+assert.equal(total.discountAmount, 10.05);
+assert.equal(total.total, 90.40);
+for (const line of [{ price: null, quantity: 1 }, { price: 10, quantity: 0 }, { price: 10, quantity: 1.5 }, { price: -1, quantity: 2 }, { price: NaN, quantity: 1 }]) assert.equal(calculateQuote([line]), null);
+assert.equal(calculateQuote([{ price: 10, quantity: 1 }], 101), null);
+assert.equal(calculateQuote([{ price: 0, quantity: 1 }]).total, 0);
+const missing = products.filter(p => !p.image && !['print-xerox', 'money-transfer'].includes(p.id));
+console.log(JSON.stringify({ products: products.length, catalogAndQuoteChecks: 'passed', physicalProductsWithoutDedicatedPhoto: missing.map(p => p.name) }, null, 2));

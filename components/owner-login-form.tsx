@@ -45,7 +45,7 @@ export function OwnerLoginForm() {
   };
 
   return <main className="login-screen"><section className="login-card">
-    <Link className="logo-lockup" href="/" aria-label="H.A.R.M Daily Needs home"><span className="logo-mark">H<span>.</span></span><span><strong>H.A.R.M</strong><small>OWNER ACCESS</small></span></Link>
+    <Link className="logo-lockup" href="/" aria-label="H.A.R Daily Needs home"><span className="logo-mark">H<span>.</span></span><span><strong>H.A.R</strong><small>OWNER ACCESS</small></span></Link>
     <span className="eyebrow">PRIVATE SHOP TOOLS</span><h1>Welcome back.</h1><p>Sign in to manage your inventory, daily sales and services.</p>
     <form className="login-form" onSubmit={handleSubmit(submit)} noValidate>
       <label>Username<input autoComplete="username" {...register("username")} aria-invalid={Boolean(errors.username)} />{errors.username && <small className="form-field-error">{errors.username.message}</small>}</label>

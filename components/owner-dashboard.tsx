@@ -1,4 +1,8 @@
 "use client";
+import { AdminReviews } from "@/components/admin-reviews";
+import { AdminRateCalculator } from "@/components/admin-rate-calculator";
+import { mergePublicProducts, normalizeSearch, canonicalProductName } from "@/lib/product-search";
+
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -19,7 +23,7 @@ type Product = { id: string; name: string; category: string; price: number; stoc
 type Sale = { id: string; type: string; productId: string; amount: number; quantity: number; note: string; occurredAt: string };
 type Transfer = { id: string; customerName: string; mobileNumber: string; amount: number; transactionId: string; serviceCharge: number; status: "Pending" | "Completed" | "Failed"; occurredAt: string };
 type StoreData = { inventory: Product[]; sales: Sale[]; transfers: Transfer[] };
-type Tab = "Overview" | "Inventory" | "Sales" | "Money transfer" | "Xerox counter" | "Analytics";
+type Tab = "Overview" | "Inventory" | "Sales" | "Money transfer" | "Xerox counter" | "Quick Rate Calculator" | "Customer Reviews" | "Analytics";
 
 const emptyData: StoreData = { inventory: [], sales: [], transfers: [] };
 const tabs: { name: Tab; icon: typeof LayoutDashboard }[] = [
@@ -28,6 +32,8 @@ const tabs: { name: Tab; icon: typeof LayoutDashboard }[] = [
   { name: "Sales", icon: CircleDollarSign },
   { name: "Money transfer", icon: Wallet },
   { name: "Xerox counter", icon: Printer },
+  { name: "Quick Rate Calculator", icon: CircleDollarSign },
+  { name: "Customer Reviews", icon: BookOpen },
   { name: "Analytics", icon: BarChart3 }
 ];
 const chartColors = ["#5b2d90", "#ff6b35", "#e7b73c", "#38a878"];
@@ -117,6 +123,8 @@ export function OwnerDashboard() {
       const result = await response.json() as { message?: string };
       if (!response.ok) throw new Error(result.message || "Could not save your changes.");
       setData(next);
+      window.dispatchEvent(new Event("harm-products-updated"));
+      try { localStorage.setItem("harm-products-updated",String(Date.now())); } catch {}
       setMessage("Saved successfully.");
       return true;
     } catch (saveError) {
@@ -289,23 +297,35 @@ export function OwnerDashboard() {
     URL.revokeObjectURL(url);
   };
 
+  const importPublicCatalog = async () => {
+    const names=new Set(data.inventory.map(p=>canonicalProductName(p.name)));
+    const additions=mergePublicProducts([]).filter(p=>p.price!==null&&!names.has(canonicalProductName(p.name))).map(p=>({id:p.key,name:p.name,category:p.id==='notebooks'?'Note Books':p.id==='office-supplies'?'Office supplies':p.id==='daily-needs'?'Daily needs':p.id==='gift-items'?'Gift Items':'Stationery',price:p.price!,stock:0,reorderLevel:5,unit:p.unit||'piece',image:p.image||''}));
+    if(!additions.length){setMessage('Public catalog products are already in inventory. Edit a product to update its public price.');return;}
+    setSaving(true);setError('');setMessage('');let imported=0;
+    try {
+      for(let offset=0;offset<additions.length;offset+=100){const batch=additions.slice(offset,offset+100);const response=await fetch('/api/admin/data',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({inventoryUpserts:batch,inventoryDeleteIds:[],salesToAdd:[],transfersToAdd:[]})});const result=await response.json();if(!response.ok)throw Error(result.message||'Could not import catalog prices.');imported+=batch.length;setData(current=>({...current,inventory:[...current.inventory,...batch]}));}
+      setMessage('Imported '+imported+' public price entries. Review amounts and set actual stock quantities.');
+    }catch(error){setError((imported?imported+' entries were saved. ':'')+(error instanceof Error?error.message:'Import failed.'));}
+    finally {setSaving(false);if(imported){window.dispatchEvent(new Event('harm-products-updated'));try{localStorage.setItem('harm-products-updated',String(Date.now()));}catch{}}}
+  };
+
   const title = tab === "Overview" ? "Shop overview" : tab;
 
   return <main className={`owner-app ${darkMode ? "owner-dark" : ""}`}>
     <aside className={`owner-sidebar ${sidebarOpen ? "sidebar-open" : ""}`}>
-      <a className="owner-logo" href="/"><span className="owner-logo-mark">H<span>.</span></span><span><strong>H.A.R.M</strong><small>OWNER STUDIO</small></span></a>
+      <a className="owner-logo" href="/"><span className="owner-logo-mark">H<span>.</span></span><span><strong>H.A.R</strong><small>OWNER STUDIO</small></span></a>
       <div className="sidebar-shop-card"><span className="shop-avatar">H</span><span><strong>Daily Needs</strong><small>Bandlaguda Jagir, Hyderabad</small></span><ChevronDown size={15} /></div>
       <span className="sidebar-label">WORKSPACE</span>
       <nav className="dashboard-nav" aria-label="Owner dashboard">
         {tabs.map(({ name, icon: Icon }) => <button key={name} className={tab === name ? "dashboard-nav-active" : ""} onClick={() => { setTab(name); setSidebarOpen(false); }}><Icon size={17} />{name}{name === "Inventory" && totals.lowStock.length > 0 && <span className="nav-alert-count">{totals.lowStock.length}</span>}</button>)}
       </nav>
-      <div className="sidebar-bottom"><div className="help-card"><span className="help-sparkle"><Sparkles size={16} /></span><strong>Need a hand?</strong><small>Your shop dashboard, all in one place.</small><a href="/">Visit public website <ArrowUpRight size={14} /></a></div><div className="sidebar-user"><span className="user-avatar">H</span><span><strong>Shop owner</strong><small>H.A.R.M Daily Needs</small></span><ShieldCheck size={16} /></div></div>
+      <div className="sidebar-bottom"><div className="help-card"><span className="help-sparkle"><Sparkles size={16} /></span><strong>Need a hand?</strong><small>Your shop dashboard, all in one place.</small><a href="/">Visit public website <ArrowUpRight size={14} /></a></div><div className="sidebar-user"><span className="user-avatar">H</span><span><strong>Shop owner</strong><small>H.A.R Daily Needs</small></span><ShieldCheck size={16} /></div></div>
     </aside>
     {sidebarOpen && <button className="sidebar-scrim" aria-label="Close navigation" onClick={() => setSidebarOpen(false)} />}
     <section className="owner-main">
       <header className="owner-topbar"><div className="owner-breadcrumb"><button className="sidebar-menu-button" onClick={() => setSidebarOpen(true)} aria-label="Open dashboard menu"><Menu size={19} /></button><span>Workspace</span><i>/</i><strong>{title}</strong></div><div className="owner-top-actions"><span className="secure-session"><span /> Secure session</span><button className="icon-action" aria-label="Toggle dark mode" onClick={() => setDarkMode(!darkMode)}>{darkMode ? <Sun size={18} /> : <Moon size={18} />}</button><form action="/api/auth/logout" method="post"><button className="logout-button"><LogOut size={15} /><span>Sign out</span></button></form></div></header>
       <div className="owner-content">
-        <div className="dashboard-heading"><div><span className="eyebrow">{new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}</span><h1>{title}<span>.</span></h1><p>Your shop, neatly in view. Here’s what’s happening today.</p></div><div className="dashboard-heading-actions"><button className="dashboard-secondary-button" onClick={() => window.print()}><FileText size={15} /> Export PDF</button><button className="dashboard-primary-button" onClick={startAddProduct}><PackagePlus size={16} /> Add product</button></div></div>
+        <div className="dashboard-heading"><div><span className="eyebrow">{new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}</span><h1>{title}<span>.</span></h1><p>Your shop, neatly in view. Here’s what’s happening today.</p></div><div className="dashboard-heading-actions"><button className="dashboard-secondary-button" onClick={() => window.print()}><FileText size={15} /> Export PDF</button><button className="dashboard-secondary-button" disabled={saving||loading} onClick={importPublicCatalog}>Import public prices</button><button className="dashboard-primary-button" onClick={startAddProduct}><PackagePlus size={16} /> Add product</button></div></div>
         {(error || message) && <div className={`dashboard-notice ${error ? "notice-error" : "notice-success"}`} role={error ? "alert" : "status"}>{error || message}{error && error.includes("MONGODB_URI") && <span> Add your MongoDB connection details to <code>.env.local</code>, then restart the app.</span>}<button onClick={() => { setError(""); setMessage(""); }} aria-label="Dismiss message"><X size={15} /></button></div>}
         {loading && <div className="dashboard-loading">Loading your saved shop records…</div>}
 
@@ -326,6 +346,10 @@ export function OwnerDashboard() {
           <div className="dashboard-bottom-grid"><article className="dashboard-panel"><PanelHeading title="Stock needs attention" subtitle="Products at or below reorder level" action="View inventory" onAction={() => setTab("Inventory")} /><div className="attention-list">{totals.lowStock.length ? totals.lowStock.slice(0, 5).map((item) => <div key={item.id}><span className={item.stock === 0 ? "stock-dot stock-empty" : "stock-dot"} /><span><strong>{item.name}</strong><small>{item.stock === 0 ? "Out of stock" : `${item.stock} ${item.unit} remaining`}</small></span><b>{item.stock === 0 ? "Order now" : "Low"}</b></div>) : <div className="dashboard-empty-inline"><Check size={17} />No low-stock products to review.</div>}</div></article>
             <article className="dashboard-panel"><PanelHeading title="Recent activity" subtitle="Latest recorded transactions" action="See sales" onAction={() => setTab("Sales")} /><div className="activity-list">{data.sales.slice(0, 5).map((sale) => <div key={sale.id}><span className="activity-icon"><Activity size={15} /></span><span><strong>{sale.note || sale.type}</strong><small>{new Date(sale.occurredAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</small></span><b>{formatMoney(sale.amount)}</b></div>)}{data.sales.length === 0 && <div className="dashboard-empty-inline">Your recorded sales will appear here.</div>}</div></article></div>
         </div>}
+
+        {tab === "Customer Reviews" && <AdminReviews />}
+
+        {tab === "Quick Rate Calculator" && <AdminRateCalculator inventory={data.inventory} />}
 
         {tab === "Inventory" && <section className="dashboard-panel full-panel"><PanelHeading title="Product inventory" subtitle={`${data.inventory.length} products · ${totals.totalItems} units available`} action="Export CSV" onAction={exportCsv} /><div className="table-toolbar"><label className="dashboard-search"><Search size={16} /><input placeholder="Search products..." value={query} onChange={(event) => setQuery(event.target.value)} /></label><select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}><option>All categories</option>{[...new Set(data.inventory.map((item) => item.category))].map((category) => <option key={category}>{category}</option>)}</select><button className="dashboard-primary-button" onClick={startAddProduct}><PackagePlus size={15} /> Add product</button></div>
           {showProductForm && <form className="record-form product-record-form" onSubmit={saveProduct}><div className="record-form-heading"><div><strong>{editingProduct ? "Edit product" : "Add a product"}</strong><small>Product details and current stock</small></div><button type="button" className="icon-action" onClick={resetProductForm} aria-label="Close form"><X size={17} /></button></div>
