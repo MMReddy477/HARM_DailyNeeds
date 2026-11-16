@@ -10,7 +10,7 @@ import { CustomerReviews } from "@/components/customer-reviews";
 import { FloatingContact } from "@/components/floating-contact";
 import { OpeningHours } from "@/components/opening-hours";
 import { HomeProducts } from "@/components/home-products";
-import { ReferenceHeroServices, ReferencePrintTrust } from "@/components/reference-home";
+import { ReferenceHeroServices } from "@/components/reference-home";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 
 const shopAddress = "2-2/30/201 My Abode the Sirius, Suryohayacolony, Bandlaguda Jagir 500086";
@@ -79,8 +79,6 @@ export function Storefront() {
       <ReferenceHeroServices />
 
       <HomeProducts />
-
-      <ReferencePrintTrust />
 
       <CustomerReviews />
 

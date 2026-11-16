@@ -83,3 +83,5 @@ npm run build
 Local route checks require the server to be running. The review-flow integration check uses configured owner credentials internally, creates one temporary pending test review, tests owner moderation, and removes that test record. It never publishes a synthetic testimonial or prints credentials.
 
 Photo source URLs are recorded in `public/images/**/sources.json`, `additional-sources.json` and `service-sources.json`. Files in the project root belonging to the earlier static prototype are retained; `npm` runs the Next.js app.
+
+The public homepage no longer displays the Print & Xerox rate-card/calculator panel. Admin > Quick Rate Calculator now contains the Print & Stationery Counter, with selectable print and stationery/book rates, quantities, quote-only overrides and saved inventory price precedence. The multi-item calculator remains below it.

@@ -1,5 +1,6 @@
 "use client";
 import { AdminReviews } from "@/components/admin-reviews";
+import { AdminCounterRates } from "@/components/admin-counter-rates";
 import { AdminRateCalculator } from "@/components/admin-rate-calculator";
 import { mergePublicProducts, normalizeSearch, canonicalProductName } from "@/lib/product-search";
 
@@ -349,7 +350,7 @@ export function OwnerDashboard() {
 
         {tab === "Customer Reviews" && <AdminReviews />}
 
-        {tab === "Quick Rate Calculator" && <AdminRateCalculator inventory={data.inventory} />}
+        {tab === "Quick Rate Calculator" && <div className="dashboard-view"><AdminCounterRates inventory={data.inventory} /><AdminRateCalculator inventory={data.inventory} /></div>}
 
         {tab === "Inventory" && <section className="dashboard-panel full-panel"><PanelHeading title="Product inventory" subtitle={`${data.inventory.length} products · ${totals.totalItems} units available`} action="Export CSV" onAction={exportCsv} /><div className="table-toolbar"><label className="dashboard-search"><Search size={16} /><input placeholder="Search products..." value={query} onChange={(event) => setQuery(event.target.value)} /></label><select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}><option>All categories</option>{[...new Set(data.inventory.map((item) => item.category))].map((category) => <option key={category}>{category}</option>)}</select><button className="dashboard-primary-button" onClick={startAddProduct}><PackagePlus size={15} /> Add product</button></div>
           {showProductForm && <form className="record-form product-record-form" onSubmit={saveProduct}><div className="record-form-heading"><div><strong>{editingProduct ? "Edit product" : "Add a product"}</strong><small>Product details and current stock</small></div><button type="button" className="icon-action" onClick={resetProductForm} aria-label="Close form"><X size={17} /></button></div>
