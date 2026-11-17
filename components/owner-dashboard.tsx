@@ -2,22 +2,21 @@
 import { AdminReviews } from "@/components/admin-reviews";
 import { AdminCounterRates } from "@/components/admin-counter-rates";
 import { AdminRateCalculator } from "@/components/admin-rate-calculator";
-import { mergePublicProducts, normalizeSearch, canonicalProductName } from "@/lib/product-search";
+import { mergePublicProducts, canonicalProductName } from "@/lib/product-search";
 
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Activity, ArrowDownToLine, ArrowUpRight, BarChart3, BookOpen, Boxes, Check,
+  Activity, ArrowUpRight, BarChart3, Bell, BookOpen, Boxes, Check,
   ChevronDown, CircleDollarSign, CreditCard, FileSpreadsheet, FileText, Gift,
-  LayoutDashboard, LogOut, Menu, Moon, PackagePlus, Printer, Search, Settings2,
+  LayoutDashboard, LogOut, Menu, Moon, PackagePlus, Plus, Printer, Search, Settings2,
   ShieldCheck, ShoppingBag, Sparkles, Sun, TrendingDown, TrendingUp, Wallet, X
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
-  Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer,
-  Tooltip, XAxis, YAxis
+  Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis
 } from "recharts";
 
 type Product = { id: string; name: string; category: string; price: number; costPrice?: number; stock: number; reorderLevel: number; unit: string; image: string; brand?: string; description?: string; status?: "Active" | "Inactive"; featured?: boolean; expiryDate?: string | null; updatedAt?: string };
@@ -95,6 +94,12 @@ const expiresWithinWeek = (value?: string | null) => {
   todayStart.setHours(0, 0, 0, 0);
   return Number.isFinite(expiry) && expiry < todayStart.getTime() + 8 * 24 * 60 * 60 * 1000;
 };
+const stockAlertText = (product: Product) => {
+  if (product.stock === 0) return "Out of stock";
+  if (product.stock <= product.reorderLevel) return `Only ${product.stock} ${product.unit} remaining`;
+  if (expiresWithinWeek(product.expiryDate)) return `Expiry ${new Date(product.expiryDate!).toLocaleDateString("en-IN")}`;
+  return `${product.stock} ${product.unit} in stock`;
+};
 
 function csvCell(value: string | number) {
   return `"${String(value).replaceAll('"', '""')}"`;
@@ -104,6 +109,7 @@ export function OwnerDashboard() {
   const [data, setData] = useState<StoreData>(emptyData);
   const [settings, setSettings] = useState<ShopSettings>(defaultSettings);
   const [settingsSaving, setSettingsSaving] = useState(false);
+  const [pendingReviewCount, setPendingReviewCount] = useState(0);
   const [tab, setTab] = useState<Tab>("Dashboard");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -212,11 +218,29 @@ export function OwnerDashboard() {
     return () => { active = false; };
   }, []);
 
+  useEffect(() => {
+    let active = true;
+    fetch("/api/admin/reviews", { cache: "no-store" })
+      .then(async response => {
+        const result = await response.json() as { reviews?: { status: string }[]; message?: string };
+        if (!response.ok) throw new Error(result.message || "Could not load review notifications.");
+        if (active) setPendingReviewCount(result.reviews?.filter(review => review.status === "pending").length ?? 0);
+      })
+      .catch(loadError => { if (active) setError(loadError instanceof Error ? loadError.message : "Could not load review notifications."); });
+    return () => { active = false; };
+  }, []);
+
   const totals = useMemo(() => {
     const dailySales = data.sales.filter((item) => isToday(item.occurredAt));
     const monthlySales = data.sales.filter((item) => isThisMonth(item.occurredAt));
     const transferToday = data.transfers.filter((item) => item.status === "Completed" && isToday(item.occurredAt));
-    const lowStock = data.inventory.filter((item) => item.stock <= item.reorderLevel || expiresWithinWeek(item.expiryDate));
+    const lowStock = data.inventory
+      .filter((item) => item.stock <= item.reorderLevel || expiresWithinWeek(item.expiryDate))
+      .sort((a, b) => {
+        const stockRiskA = a.stock === 0 ? 0 : a.stock / Math.max(1, a.reorderLevel);
+        const stockRiskB = b.stock === 0 ? 0 : b.stock / Math.max(1, b.reorderLevel);
+        return stockRiskA - stockRiskB;
+      });
     const todayRevenue = dailySales.reduce((sum, item) => sum + item.amount, 0);
     const xeroxRevenue = dailySales.filter((item) => ["B/W Xerox", "Color Xerox", "Lamination", "Spiral binding", "Scanning"].includes(item.type)).reduce((sum, item) => sum + item.amount, 0);
     const printingRevenue = dailySales.filter((item) => item.type === "Printouts").reduce((sum, item) => sum + item.amount, 0);
@@ -225,6 +249,7 @@ export function OwnerDashboard() {
       + data.transfers.filter((item) => item.status === "Completed" && isThisMonth(item.occurredAt)).reduce((sum, item) => sum + item.serviceCharge, 0);
     const stockValue = data.inventory.reduce((sum, item) => sum + item.stock * (item.costPrice ?? 0), 0);
     const todayProfit = dailySales.filter(item => item.profit !== undefined).reduce((sum, item) => sum + (item.profit ?? 0), 0) + transferRevenue;
+    const todayProfitComplete = dailySales.every(item => item.profit !== undefined);
     const customers = new Set([
       ...dailySales.map((item) => item.transactionId || item.id),
       ...transferToday.map((item) => item.mobileNumber)
@@ -235,7 +260,8 @@ export function OwnerDashboard() {
     const monthProfit = monthlySales.filter(item => item.profit !== undefined).reduce((sum, item) => sum + (item.profit ?? 0), 0)
       + data.transfers.filter((item) => item.status === "Completed" && isThisMonth(item.occurredAt)).reduce((sum, item) => sum + item.serviceCharge, 0)
       - monthlyExpenses;
-    return { dailySales, todayRevenue, todayProfit: todayProfit - todayExpenses, xeroxRevenue, printingRevenue, transferRevenue, monthRevenue, monthProfit, monthlyExpenses, stockValue, lowStock, customers, productsSoldToday, totalItems: data.inventory.reduce((sum, item) => sum + item.stock, 0) };
+    const monthProfitComplete = monthlySales.every(item => item.profit !== undefined);
+    return { dailySales, todayRevenue, todayProfit: todayProfit - todayExpenses, todayProfitComplete, xeroxRevenue, printingRevenue, transferRevenue, monthRevenue, monthProfit, monthProfitComplete, monthlyExpenses, stockValue, lowStock, customers, productsSoldToday, totalItems: data.inventory.reduce((sum, item) => sum + item.stock, 0) };
   }, [data]);
 
   const filteredProducts = data.inventory.filter((product) =>
@@ -258,21 +284,22 @@ export function OwnerDashboard() {
       const key = date.toLocaleDateString("en-CA");
       const sales = data.sales.filter((item) => new Date(item.occurredAt).toLocaleDateString("en-CA") === key);
       const transfers = data.transfers.filter((item) => item.status === "Completed" && new Date(item.occurredAt).toLocaleDateString("en-CA") === key);
+      const dayTransfers = data.transfers.filter(item => item.status === "Completed" && new Date(item.occurredAt).toLocaleDateString("en-CA") === key);
+      const dayExpenses = data.expenses.filter(item => new Date(item.occurredAt).toLocaleDateString("en-CA") === key);
+      const salesWithKnownProfit = sales.filter(item => item.profit !== undefined);
       return {
         day: date.toLocaleDateString("en-IN", { weekday: "short" }),
-        revenue: sales.reduce((sum, sale) => sum + sale.amount, 0) + transfers.reduce((sum, item) => sum + item.serviceCharge, 0),
+        revenue: sales.reduce((sum, sale) => sum + sale.amount, 0) + dayTransfers.reduce((sum, item) => sum + item.serviceCharge, 0),
+        profit: salesWithKnownProfit.length === sales.length
+          ? salesWithKnownProfit.reduce((sum, sale) => sum + (sale.profit ?? 0), 0)
+            + dayTransfers.reduce((sum, item) => sum + item.serviceCharge, 0)
+            - dayExpenses.reduce((sum, item) => sum + item.amount, 0)
+          : null,
         sales: sales.length + transfers.length
       };
     });
     return days;
   }, [data]);
-  const categoryData = useMemo(() => {
-    const totalsByCategory = data.inventory.reduce<Record<string, number>>((accumulator, product) => {
-      accumulator[product.category] = (accumulator[product.category] || 0) + product.stock;
-      return accumulator;
-    }, {});
-    return Object.entries(totalsByCategory).map(([name, value]) => ({ name, value }));
-  }, [data.inventory]);
   const topProducts = useMemo(() => {
     const values = new Map<string, number>();
     data.sales.forEach((sale) => {
@@ -282,6 +309,29 @@ export function OwnerDashboard() {
       name: data.inventory.find((item) => item.id === id)?.name || "Removed product", quantity
     }));
   }, [data.inventory, data.sales]);
+  const recentTransactions = useMemo(() => {
+    const transactions = new Map<string, { id: string; occurredAt: string; customerName: string; items: string[]; total: number; profit: number | null }>();
+    for (const sale of data.sales) {
+      const id = sale.transactionId || sale.id;
+      const current = transactions.get(id);
+      if (current) {
+        current.items.push(`${sale.note || sale.type} × ${sale.quantity}`);
+        current.total += sale.amount;
+        if (sale.profit === undefined) current.profit = null;
+        else if (current.profit !== null) current.profit += sale.profit;
+      } else {
+        transactions.set(id, {
+          id,
+          occurredAt: sale.occurredAt,
+          customerName: sale.customerName || "Walk-in customer",
+          items: [`${sale.note || sale.type} × ${sale.quantity}`],
+          total: sale.amount,
+          profit: sale.profit === undefined ? null : sale.profit
+        });
+      }
+    }
+    return [...transactions.values()].sort((a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime()).slice(0, 8);
+  }, [data.sales]);
 
   const resetProductForm = () => {
     setEditingProduct(null);
@@ -298,6 +348,7 @@ export function OwnerDashboard() {
   };
 
   const editProduct = (product: Product) => {
+    setTab("Inventory");
     setEditingProduct(product);
     setShowProductForm(true);
     setImageData(product.image);
@@ -532,15 +583,14 @@ export function OwnerDashboard() {
     <aside className={`owner-sidebar ${sidebarOpen ? "sidebar-open" : ""}`}>
       <a className="owner-logo" href="/"><span className="owner-logo-mark"><img src="/brand/harm-icon.svg" alt="HM monogram" width={48} height={48}/></span><span><strong>{settings.businessName}</strong><small>OWNER STUDIO</small></span></a>
       <div className="sidebar-shop-card"><span className="shop-avatar"><img src="/brand/harm-icon.svg" width={36} height={36} alt="HM monogram"/></span><span><strong>{settings.businessName}</strong><small>{settings.address}</small></span><ChevronDown size={15} /></div>
-      <span className="sidebar-label">WORKSPACE</span>
       <nav className="dashboard-nav" aria-label="Owner dashboard">
-        {tabs.map(({ name, icon: Icon }) => <button key={name} className={tab === name ? "dashboard-nav-active" : ""} onClick={() => { setTab(name); setSidebarOpen(false); }}><Icon size={17} />{name}{name === "Low Stock Alerts" && totals.lowStock.length > 0 && <span className="nav-alert-count">{totals.lowStock.length}</span>}</button>)}
+        {tabs.map(({ name, icon: Icon }, index) => <Fragment key={name}>{[0, 1, 5, 7, 12].includes(index) && <span className="sidebar-label">{({ 0: "OVERVIEW", 1: "CATALOG", 5: "SELL", 7: "SERVICES", 12: "MANAGE" } as Record<number, string>)[index]}</span>}<button className={tab === name ? "dashboard-nav-active" : ""} onClick={() => { setTab(name); setSidebarOpen(false); }}><Icon size={17} />{name}{name === "Low Stock Alerts" && totals.lowStock.length > 0 && <span className="nav-alert-count">{totals.lowStock.length}</span>}</button></Fragment>)}
       </nav>
-      <div className="sidebar-bottom"><div className="help-card"><span className="help-sparkle"><Sparkles size={16} /></span><strong>Need a hand?</strong><small>Your shop dashboard, all in one place.</small><a href="/">Visit public website <ArrowUpRight size={14} /></a></div><div className="sidebar-user"><span className="user-avatar">H</span><span><strong>Shop owner</strong><small>H.A.R.M Daily Needs</small></span><ShieldCheck size={16} /></div></div>
+      <div className="sidebar-bottom"><div className="sidebar-store-hours"><span className="store-hours-dot" /><span><strong>STORE HOURS</strong><small>{settings.storeHours}</small></span></div><div className="sidebar-user"><span className="user-avatar">H</span><span><strong>Shop owner</strong><small>{settings.businessName}</small></span><ShieldCheck size={16} /></div></div>
     </aside>
     {sidebarOpen && <button className="sidebar-scrim" aria-label="Close navigation" onClick={() => setSidebarOpen(false)} />}
     <section className="owner-main">
-      <header className="owner-topbar"><div className="owner-breadcrumb"><button className="sidebar-menu-button" onClick={() => setSidebarOpen(true)} aria-label="Open dashboard menu"><Menu size={19} /></button><span>Workspace</span><i>/</i><strong>{title}</strong></div><div className="owner-top-actions"><span className="secure-session"><span /> Secure session</span><button className="icon-action" aria-label="Toggle dark mode" onClick={() => setDarkMode(!darkMode)}>{darkMode ? <Sun size={18} /> : <Moon size={18} />}</button><form action="/api/auth/logout" method="post"><button className="logout-button"><LogOut size={15} /><span>Sign out</span></button></form></div></header>
+      <header className="owner-topbar"><div className="owner-breadcrumb"><button className="sidebar-menu-button" onClick={() => setSidebarOpen(true)} aria-label="Open dashboard menu"><Menu size={19} /></button><span>Admin Dashboard</span><i>/</i><strong>{title}</strong></div><div className="owner-top-actions"><button className="icon-action dashboard-notification-action" aria-label={`View ${totals.lowStock.length} stock alerts and ${pendingReviewCount} pending reviews`} onClick={() => setTab(totals.lowStock.length ? "Low Stock Alerts" : "Customer Reviews")}><Bell size={18} />{totals.lowStock.length + pendingReviewCount > 0 && <span>{totals.lowStock.length + pendingReviewCount}</span>}</button><button className="dashboard-primary-button topbar-new-sale" onClick={() => setTab("Billing & POS")}><Plus size={16} /> New Sale</button><button className="icon-action" aria-label="Toggle dark mode" onClick={() => setDarkMode(!darkMode)}>{darkMode ? <Sun size={18} /> : <Moon size={18} />}</button><form action="/api/auth/logout" method="post"><button className="logout-button"><LogOut size={15} /><span>Sign out</span></button></form></div></header>
       <div className="owner-content"><div className="print-brand-header"><img src="/brand/harm-horizontal.svg" width={480} height={90} alt={`${settings.businessName} — Stationery, Dairy & Refreshing Drinks Under One Roof`}/><p>{settings.address} · {settings.phone} · {settings.storeHours}</p></div>
         <div className="dashboard-heading"><div><span className="eyebrow">{new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}</span><h1>{title}<span>.</span></h1><p>Your shop, neatly in view. Here’s what’s happening today.</p></div><div className="dashboard-heading-actions"><button className="dashboard-secondary-button" onClick={() => window.print()}><FileText size={15} /> Export PDF</button><button className="dashboard-secondary-button" disabled={saving||loading} onClick={importPublicCatalog}>Import public prices</button><button className="dashboard-primary-button" onClick={startAddProduct}><PackagePlus size={16} /> Add product</button></div></div>
         {(error || message) && <div className={`dashboard-notice ${error ? "notice-error" : "notice-success"}`} role={error ? "alert" : "status"}>{error || message}{error && error.includes("MONGODB_URI") && <span> Add your MongoDB connection details to <code>.env.local</code>, then restart the app.</span>}<button onClick={() => { setError(""); setMessage(""); }} aria-label="Dismiss message"><X size={15} /></button></div>}
@@ -550,8 +600,8 @@ export function OwnerDashboard() {
         {tab === "Dashboard" && <div className="dashboard-view">
           <div className="metric-grid">
             <Metric icon={CircleDollarSign} label="Today's sales" value={formatMoney(totals.todayRevenue)} sub={`${totals.dailySales.length} transactions`} tone="purple" />
-            <Metric icon={TrendingUp} label="Today's profit" value={formatMoney(totals.todayProfit)} sub="After recorded expenses" tone="green" />
-            <Metric icon={TrendingUp} label="Monthly revenue" value={formatMoney(totals.monthRevenue)} sub={`Profit ${formatMoney(totals.monthProfit)}`} tone="gold" />
+            <Metric icon={TrendingUp} label="Today's profit" value={formatMoney(totals.todayProfit)} sub={totals.todayProfitComplete ? "After recorded expenses" : "Known profit only; older cost data missing"} tone="green" />
+            <Metric icon={TrendingUp} label="Monthly revenue" value={formatMoney(totals.monthRevenue)} sub={`${totals.monthProfitComplete ? "Profit" : "Known profit"} ${formatMoney(totals.monthProfit)}`} tone="gold" />
             <Metric icon={ShoppingBag} label="Total products" value={data.inventory.length.toLocaleString("en-IN")} sub={`${totals.totalItems} units on hand`} tone="blue" />
             <Metric icon={CreditCard} label="Inventory value" value={formatMoney(totals.stockValue)} sub="At recorded buying cost" tone="mint" />
             <Metric icon={Boxes} label="Products sold today" value={totals.productsSoldToday.toLocaleString("en-IN")} sub="Inventory units sold" tone="orange" />
@@ -559,10 +609,20 @@ export function OwnerDashboard() {
             <Metric icon={ShoppingBag} label="Customers served" value={totals.customers.toLocaleString("en-IN")} sub="Recorded sales and transfers" tone="pink" />
           </div>
           {expiringProducts.length > 0 && <section className="dashboard-panel expiry-alert-panel"><PanelHeading title="Dairy expiry watch" subtitle="Expired or expiring within 7 days" action="Review inventory" onAction={() => setTab("Milk & Dairy")} /><div className="attention-list">{expiringProducts.slice(0, 6).map(item => <div key={item.id}><span className="stock-dot stock-empty" /><span><strong>{item.name}</strong><small>{item.stock} {item.unit} · Expires {new Date(item.expiryDate!).toLocaleDateString("en-IN")}</small></span><b>{new Date(item.expiryDate!).getTime() < Date.now() ? "Expired" : "Soon"}</b></div>)}</div></section>}
-          <div className="dashboard-chart-grid"><article className="dashboard-panel revenue-panel"><PanelHeading title="Revenue overview" subtitle="Your recorded revenue · last 7 days" action="Last 7 days" /><div className="chart-wrap"><ResponsiveContainer width="100%" height="100%"><AreaChart data={chartData} margin={{ top: 10, right: 12, left: -18, bottom: 0 }}><defs><linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#7541a5" stopOpacity={.2} /><stop offset="100%" stopColor="#7541a5" stopOpacity={0} /></linearGradient></defs><CartesianGrid stroke="#eeeaf2" strokeDasharray="4 5" vertical={false} /><XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "#928a99" }} /><YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: "#928a99" }} tickFormatter={(value: number) => `₹${value}`} /><Tooltip formatter={(value) => [formatMoney(Number(value)), "Revenue"]} contentStyle={{ borderRadius: 10, border: "1px solid #eee8f2", fontSize: 11 }} /><Area type="monotone" dataKey="revenue" stroke="#7541a5" strokeWidth={2.5} fill="url(#revenueFill)" /></AreaChart></ResponsiveContainer></div></article>
-            <article className="dashboard-panel category-panel"><PanelHeading title="Inventory by category" subtitle="Current units on hand" /><div className="category-chart"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={categoryData} dataKey="value" nameKey="name" innerRadius={56} outerRadius={78} paddingAngle={4}>{categoryData.map((item, index) => <Cell key={item.name} fill={chartColors[index % chartColors.length]} />)}</Pie><Tooltip /></PieChart></ResponsiveContainer><div className="chart-total"><strong>{totals.totalItems}</strong><small>units</small></div></div><div className="category-legend">{categoryData.slice(0, 4).map((item, index) => <span key={item.name}><i style={{ background: chartColors[index % chartColors.length] }} />{item.name}<strong>{item.value}</strong></span>)}{categoryData.length === 0 && <p>Add products to see your inventory mix.</p>}</div></article></div>
-          <div className="dashboard-bottom-grid"><article className="dashboard-panel"><PanelHeading title="Stock needs attention" subtitle="Products at or below reorder level" action="View inventory" onAction={() => setTab("Inventory")} /><div className="attention-list">{totals.lowStock.length ? totals.lowStock.slice(0, 5).map((item) => <div key={item.id}><span className={item.stock === 0 ? "stock-dot stock-empty" : "stock-dot"} /><span><strong>{item.name}</strong><small>{item.stock === 0 ? "Out of stock" : `${item.stock} ${item.unit} remaining`}</small></span><b>{item.stock === 0 ? "Order now" : "Low"}</b></div>) : <div className="dashboard-empty-inline"><Check size={17} />No low-stock products to review.</div>}</div></article>
-            <article className="dashboard-panel"><PanelHeading title="Recent activity" subtitle="Latest recorded transactions" action="See sales" onAction={() => setTab("Sales")} /><div className="activity-list">{data.sales.slice(0, 5).map((sale) => <div key={sale.id}><span className="activity-icon"><Activity size={15} /></span><span><strong>{sale.note || sale.type}</strong><small>{new Date(sale.occurredAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</small></span><b>{formatMoney(sale.amount)}</b></div>)}{data.sales.length === 0 && <div className="dashboard-empty-inline">Your recorded sales will appear here.</div>}</div></article></div>
+          <div className="dashboard-home-primary">
+            <article className="dashboard-panel revenue-panel"><PanelHeading title="Revenue — last 7 days" subtitle="Daily revenue and known profit" action="View reports" onAction={() => setTab("Reports & Analytics")} /><div className="chart-wrap"><ResponsiveContainer width="100%" height="100%"><AreaChart data={chartData} margin={{ top: 10, right: 12, left: -18, bottom: 0 }}><defs><linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#6d28d9" stopOpacity={.2} /><stop offset="100%" stopColor="#6d28d9" stopOpacity={0} /></linearGradient></defs><CartesianGrid stroke="#e9edf4" strokeDasharray="4 5" vertical={false} /><XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#526174" }} /><YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "#526174" }} tickFormatter={(value: number) => `₹${value}`} /><Tooltip formatter={(value, name) => [value === null ? "Unavailable" : formatMoney(Number(value)), name === "profit" ? "Known profit" : "Revenue"]} contentStyle={{ borderRadius: 10, border: "1px solid #e2e8f0", fontSize: 12 }} /><Area type="monotone" dataKey="revenue" stroke="#6d28d9" strokeWidth={2.5} fill="url(#revenueFill)" /><Area type="monotone" dataKey="profit" stroke="#10a66a" strokeWidth={2} fill="none" connectNulls={false} /></AreaChart></ResponsiveContainer><div className="chart-legend"><span><i className="legend-revenue" />Revenue</span><span><i className="legend-profit" />Known profit</span></div></div></article>
+            <article className="dashboard-panel"><PanelHeading title="Notifications" subtitle="Alerts and recent store activity" action={`${totals.lowStock.length} alerts`} onAction={() => setTab("Low Stock Alerts")} /><div className="notification-list">
+              {totals.lowStock.slice(0, 5).map(item => <button key={item.id} className="notification-item" onClick={() => { setTab("Low Stock Alerts"); setQuery(item.name); }}><span className={`notification-icon ${item.stock === 0 ? "notification-critical" : ""}`}><TrendingDown size={15} /></span><span><strong>{item.name}</strong><small>{stockAlertText(item)}{item.stock > 0 && item.stock <= item.reorderLevel ? ` · reorder at ${item.reorderLevel}` : ""}</small></span><time>{item.updatedAt ? new Date(item.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" }) : "Now"}</time></button>)}
+              {expiringProducts.slice(0, 3).map(item => <button key={`expiry-${item.id}`} className="notification-item" onClick={() => setTab("Milk & Dairy")}><span className="notification-icon notification-warning"><Activity size={15} /></span><span><strong>{item.name}</strong><small>{new Date(item.expiryDate!).getTime() < Date.now() ? "Expired" : "Expiry coming up"} · {new Date(item.expiryDate!).toLocaleDateString("en-IN")}</small></span><time>Check</time></button>)}
+              {pendingReviewCount > 0 && <button className="notification-item" onClick={() => setTab("Customer Reviews")}><span className="notification-icon notification-warning"><BookOpen size={15} /></span><span><strong>New customer reviews</strong><small>{pendingReviewCount} review{pendingReviewCount === 1 ? "" : "s"} waiting for moderation</small></span><time>Review</time></button>}
+              <div className="notification-summary"><span className="notification-icon notification-success"><CircleDollarSign size={15} /></span><span><strong>Today’s sales summary</strong><small>{totals.dailySales.length} transactions recorded today</small></span><b>{formatMoney(totals.todayRevenue)}</b></div>
+              {totals.lowStock.length === 0 && expiringProducts.length === 0 && <div className="dashboard-empty-inline"><Check size={17} />No stock or expiry alerts. Your inventory looks healthy.</div>}
+            </div></article>
+          </div>
+          <div className="dashboard-home-secondary">
+            <article className="dashboard-panel recent-sales-panel"><PanelHeading title="Recent sales" subtitle="Latest completed product transactions" action="View all" onAction={() => setTab("Sales")} /><div className="table-scroll"><table className="owner-table dashboard-sales-table"><thead><tr><th>TIME</th><th>ITEMS</th><th>CUSTOMER</th><th>TOTAL</th><th>PROFIT</th></tr></thead><tbody>{recentTransactions.map(sale => <tr key={sale.id}><td>{new Date(sale.occurredAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</td><td className="sales-items-cell">{sale.items.join(", ")}</td><td>{sale.customerName}</td><td><strong>{formatMoney(sale.total)}</strong></td><td className={sale.profit !== null && sale.profit >= 0 ? "sales-profit-value" : ""}>{sale.profit === null ? "—" : formatMoney(sale.profit)}</td></tr>)}{recentTransactions.length === 0 && <tr><td colSpan={5} className="table-empty">Recorded transactions will appear here after your first sale.</td></tr>}</tbody></table></div></article>
+            <article className="dashboard-panel"><PanelHeading title="Low stock alerts" subtitle={`${totals.lowStock.length} products need a check`} action="View all" onAction={() => setTab("Low Stock Alerts")} /><div className="low-stock-list">{totals.lowStock.slice(0, 6).map(item => <div key={item.id} className="low-stock-row"><span><strong>{item.name}</strong><small className={item.stock === 0 ? "low-stock-empty" : ""}>{stockAlertText(item)}</small></span><button className="dashboard-secondary-button" onClick={() => editProduct(item)}>{item.stock <= item.reorderLevel ? "Restock" : "Check date"}</button></div>)}{totals.lowStock.length === 0 && <div className="dashboard-empty-inline"><Check size={17} />No items need restocking.</div>}</div></article>
+          </div>
         </div>}
 
         {tab === "Categories" && <section className="dashboard-panel full-panel"><PanelHeading title="Product categories" subtitle={`${activeCategories.length} categories in use`} /><div className="category-card-grid">{activeCategories.map(category => { const products = data.inventory.filter(item => item.category === category); return <button key={category} className="category-admin-card" onClick={() => { setCategoryFilter(category); setTab("Products"); }}><span><BookOpen size={19} /></span><strong>{category}</strong><small>{products.length} products · {products.reduce((sum, product) => sum + product.stock, 0)} units</small></button>; })}{activeCategories.length === 0 && <div className="dashboard-empty-inline">Categories appear here when you add products.</div>}</div></section>}
@@ -581,7 +641,8 @@ export function OwnerDashboard() {
           {showProductForm && <form className="record-form product-record-form" onSubmit={saveProduct}><div className="record-form-heading"><div><strong>{editingProduct ? "Edit product" : "Add a product"}</strong><small>Product details and current stock</small></div><button type="button" className="icon-action" onClick={resetProductForm} aria-label="Close form"><X size={17} /></button></div>
             <div className="form-grid"><label>Product name<input {...productForm.register("name")} placeholder="e.g. Ruled notebook" />{productForm.formState.errors.name && <small className="field-error">{productForm.formState.errors.name.message}</small>}</label><label>Category<input list="inventory-categories" {...productForm.register("category")} placeholder="e.g. Stationery" />{productForm.formState.errors.category && <small className="field-error">{productForm.formState.errors.category.message}</small>}<datalist id="inventory-categories">{["School Supplies", "Office Supplies", "Note Books", "Milk & Dairy", "Cool Drinks", "Gift Items", "Print & Xerox", "Money Transfer"].map(category => <option key={category} value={category}/>)}</datalist></label><label>Brand<input {...productForm.register("brand")} placeholder="Brand name" /></label><label>Buying price (₹)<input type="number" step="0.01" min="0" {...productForm.register("costPrice")} /></label><label>Selling price (₹)<input type="number" step="0.01" min="0" {...productForm.register("price")} /></label><label>Quantity in stock<input type="number" min="0" step="1" {...productForm.register("stock")} /></label><label>Reorder alert at<input type="number" min="0" step="1" {...productForm.register("reorderLevel")} /></label><label>Stock unit<input {...productForm.register("unit")} placeholder="piece, pack, litre" /></label><label>Status<select {...productForm.register("status")}><option>Active</option><option>Inactive</option></select></label><label>Expiry date (dairy)<input type="date" {...productForm.register("expiryDate")} /></label><label className="form-checkbox"><input type="checkbox" {...productForm.register("featured")} /> Featured product</label><label className="form-span-all">Description<textarea rows={2} {...productForm.register("description")} placeholder="Product details"/></label><label className="upload-field">Product image<input ref={imageInput} type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => { const file = event.target.files?.[0]; if (!file) return; if (file.size > 900_000) { setError("Choose an image smaller than 900 KB."); event.target.value = ""; return; } const reader = new FileReader(); reader.onload = () => setImageData(String(reader.result)); reader.onerror = () => setError("Could not read the selected image."); reader.readAsDataURL(file); }} />{imageData && <span>Image selected</span>}</label></div><div className="form-actions"><button className="dashboard-secondary-button" type="button" onClick={resetProductForm}>Cancel</button><button className="dashboard-primary-button" type="submit" disabled={saving}>{saving ? "Saving…" : editingProduct ? "Save changes" : "Add product"}</button></div></form>}
           {selectedProductIds.length > 0 && <div className="bulk-toolbar"><strong>{selectedProductIds.length} selected</strong><label>Adjust stock<input aria-label="Stock adjustment" type="number" step="1" value={bulkStockDelta} onChange={event => setBulkStockDelta(Number(event.target.value))}/></label><select aria-label="Bulk product status" value={bulkStatus} onChange={event => setBulkStatus(event.target.value as "Active" | "Inactive")}><option>Active</option><option>Inactive</option></select><button className="dashboard-primary-button" disabled={saving} onClick={applyBulkUpdate}>Apply bulk update</button><button className="dashboard-secondary-button" onClick={() => setSelectedProductIds([])}>Clear</button></div>}
-          <div className="table-scroll"><table className="owner-table"><thead><tr><th><input type="checkbox" aria-label="Select all filtered products" checked={filteredProducts.length > 0 && filteredProducts.every(item => selectedProductIds.includes(item.id))} onChange={event => setSelectedProductIds(event.target.checked ? [...new Set([...selectedProductIds, ...filteredProducts.map(item => item.id)])] : selectedProductIds.filter(id => !filteredProducts.some(item => item.id === id)))}/></th><th>PRODUCT</th><th>CATEGORY</th><th>STOCK</th><th>BUYING PRICE</th><th>SELLING PRICE</th><th>MARGIN</th><th>STATUS</th><th>ACTIONS</th></tr></thead><tbody>{filteredProducts.map((item) => <tr key={item.id}><td><input type="checkbox" aria-label={`Select ${item.name}`} checked={selectedProductIds.includes(item.id)} onChange={event => setSelectedProductIds(event.target.checked ? [...selectedProductIds, item.id] : selectedProductIds.filter(id => id !== item.id))}/></td><td><div className="product-cell">{item.image ? <img src={item.image} alt="" /> : <span className="table-product-placeholder"><BookOpen size={16} /></span>}<span><strong>{item.name}{item.featured && " ★"}</strong><small>{item.brand || item.unit}</small></span></div></td><td>{item.category}</td><td><strong>{item.stock}</strong> {item.unit}<small className="table-subtext">Reorder at {item.reorderLevel}</small></td><td>{formatMoney(item.costPrice ?? 0)}</td><td>{formatMoney(item.price)}</td><td>{formatMoney(item.price - (item.costPrice ?? 0))}</td><td><span className={`inventory-status ${item.status === "Inactive" ? "status-out" : item.stock === 0 ? "status-out" : item.stock <= item.reorderLevel ? "status-low" : "status-good"}`}><i />{item.status === "Inactive" ? "Inactive" : item.stock === 0 ? "Out of stock" : item.stock <= item.reorderLevel ? "Low stock" : "In stock"}</span></td><td><button className="table-action" onClick={() => editProduct(item)}>Edit</button><button className="table-action table-delete" onClick={() => removeProduct(item.id)}>Delete</button></td></tr>)}{filteredProducts.length === 0 && <tr><td colSpan={9} className="table-empty">{data.inventory.length ? "No products match your search." : "No inventory yet. Add your first product to begin."}</td></tr>}</tbody></table></div>
+          <div className="table-scroll"><table className="owner-table"><thead><tr><th><input type="checkbox" aria-label="Select all filtered products" checked={filteredProducts.length > 0 && filteredProducts.every(item => selectedProductIds.includes(item.id))} onChange={event => setSelectedProductIds(event.target.checked ? [...new Set([...selectedProductIds, ...filteredProducts.map(item => item.id)])] : selectedProductIds.filter(id => !filteredProducts.some(item => item.id === id)))}/></th><th>PRODUCT</th><th>CATEGORY</th><th>CURRENT STOCK</th><th>BUYING PRICE</th><th>SELLING PRICE</th><th>MARGIN</th><th>STOCK VALUE</th><th>LAST UPDATED</th><th>STATUS</th><th>ACTIONS</th></tr></thead><tbody>{filteredProducts.map((item) => <tr key={item.id}><td><input type="checkbox" aria-label={`Select ${item.name}`} checked={selectedProductIds.includes(item.id)} onChange={event => setSelectedProductIds(event.target.checked ? [...selectedProductIds, item.id] : selectedProductIds.filter(id => id !== item.id))}/></td><td><div className="product-cell">{item.image ? <img src={item.image} alt="" /> : <span className="table-product-placeholder"><BookOpen size={16} /></span>}<span><strong>{item.name}{item.featured && " ★"}</strong><small>{item.brand || item.unit}</small></span></div></td><td>{item.category}</td><td><strong>{item.stock}</strong> {item.unit}<small className="table-subtext">Reorder at {item.reorderLevel}</small></td><td>{formatMoney(item.costPrice ?? 0)}</td><td>{formatMoney(item.price)}</td><td>{formatMoney(item.price - (item.costPrice ?? 0))}</td><td>{formatMoney(item.stock * (item.costPrice ?? 0))}</td><td>{item.updatedAt ? new Date(item.updatedAt).toLocaleDateString("en-IN") : "—"}</td><td><span className={`inventory-status ${item.status === "Inactive" ? "status-out" : item.stock === 0 ? "status-out" : item.stock <= item.reorderLevel ? "status-low" : "status-good"}`}><i />{item.status === "Inactive" ? "Inactive" : item.stock === 0 ? "Out of stock" : item.stock <= item.reorderLevel ? "Low stock" : "In stock"}</span></td><td><button className="table-action" onClick={() => editProduct(item)}>Edit</button><button className="table-action table-delete" onClick={() => removeProduct(item.id)}>Delete</button></td></tr>)}{filteredProducts.length === 0 && <tr><td colSpan={11} className="table-empty">{data.inventory.length ? "No products match your search." : "No inventory yet. Add your first product to begin."}</td></tr>}</tbody></table></div>
+          {tab === "Milk & Dairy" && <div className="dashboard-panel dairy-sales-panel"><PanelHeading title="Today’s dairy sales" subtitle="Sales recorded for milk and dairy products" /><div className="report-total"><span>Revenue today</span><strong>{formatMoney(totals.dailySales.filter(sale => /milk|dairy|curd|paneer|butter|cheese/i.test(`${sale.type} ${sale.note}`)).reduce((sum, sale) => sum + sale.amount, 0))}</strong><span>Units sold</span><strong>{totals.dailySales.filter(sale => sale.productId && /milk|dairy|curd|paneer|butter|cheese/i.test(`${sale.type} ${sale.note}`)).reduce((sum, sale) => sum + sale.quantity, 0)}</strong></div></div>}
         </section>}
 
         {tab === "Sales" && <div className="recording-grid"><section className="dashboard-panel"><PanelHeading title="Record a sale" subtitle="Select any active product to record a sale and deduct stock" /><form className="record-form" onSubmit={recordSale}><label>Product<select required value={saleProductId} onChange={event => { setSaleProductId(event.target.value); const item = data.inventory.find(product => product.id === event.target.value); if (item) setSaleAmount(String(item.price * saleQuantity)); }}><option value="">Choose a product</option>{availableProducts.map(item => <option key={item.id} value={item.id}>{item.name} · {item.stock} in stock</option>)}</select></label><label>Quantity<input type="number" min="1" max={data.inventory.find(item => item.id === saleProductId)?.stock || 1} step="1" value={saleQuantity} onChange={event => { const quantity = Number(event.target.value); setSaleQuantity(quantity); const item = data.inventory.find(product => product.id === saleProductId); if (item) setSaleAmount(String(item.price * quantity)); }} /></label><label>Customer name (optional)<input value={saleCustomer} onChange={event => setSaleCustomer(event.target.value)} /></label><label>Total amount (₹)<input type="number" min="0.01" step="0.01" value={saleAmount} onChange={event => setSaleAmount(event.target.value)} required /></label><button className="dashboard-primary-button" disabled={saving || !saleProductId}><Check size={15} /> Record sale</button></form>{receiptSales.length > 0 && <button className="dashboard-secondary-button" onClick={() => printReceipt(receiptSales)}>Print last receipt</button>}</section>
