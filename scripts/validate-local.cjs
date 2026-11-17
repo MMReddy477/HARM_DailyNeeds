@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const base = 'http://localhost:3000';
-const routes = ['/', '/stationery', '/notebooks', '/office-supplies', '/gift-shop', '/daily-needs', '/shop', '/shop?department=office-supplies', '/shop?department=notebooks&q=100', '/shop?department=gift-items&q=marriage', '/owner-login'];
+const routes = ['/', '/stationery', '/notebooks', '/office-supplies', '/gift-shop', '/daily-needs', '/milk-dairy', '/cool-drinks', '/shop', '/shop?department=office-supplies', '/shop?department=notebooks&q=100', '/shop?department=gift-items&q=marriage', '/owner-login'];
 (async () => {
   const assets = new Set();
   for (const route of routes) {
@@ -9,7 +9,7 @@ const routes = ['/', '/stationery', '/notebooks', '/office-supplies', '/gift-sho
     const html = await response.text();
     assert(!html.includes('Internal Server Error'), route);
     for (const match of html.matchAll(/(?:src|href)="(\/(?:images|banners|product-images|_next\/static)[^"?]*)/g)) assets.add(match[1]);
-    if (route === '/') for (const text of ['4.9 Rated by Customers', 'weekly-opening-hours', 'Share Location', 'Get Directions', 'school-slideshow']) assert(html.includes(text), text);
+    if (route === '/') for (const text of ['4.9 Rated by Customers', 'weekly-opening-hours', 'Share Location', 'Get Directions', 'daily-store-hero']) assert(html.includes(text), text);
   }
   for (const asset of assets) assert.equal((await fetch(base + asset, { method: 'HEAD' })).status, 200, asset);
   const protectedApi = await fetch(base + '/api/admin/data');

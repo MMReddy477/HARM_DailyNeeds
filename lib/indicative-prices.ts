@@ -13,6 +13,10 @@ export function indicativePrice(name:string,department=''):number|null {
  if(/graph/.test(n))return 30;
  if(/practical|observation|lab record|project record|class work record/.test(n))return 60;
  if(/register|ledger/.test(n))return 80;
+ if(/a4.*notebook/.test(n))return 100;
+ if(/unruled|composition/.test(n))return 25;
+ if(/ruled.*notebook/.test(n))return 40;
+ if(/classmate/.test(n))return 60;
  if(/book|note|record/.test(n))return 40;
  if(/eraser|sharpener|chalk/.test(n))return 5;
  if(/pencil box/.test(n))return 50;
@@ -41,6 +45,8 @@ export function indicativePrice(name:string,department=''):number|null {
  if(/frame/.test(n))return 120;
  if(/gift wrapping/.test(n))return 20;
  if(/gift/.test(n))return 100;
+ if(/paneer/.test(n))return 100;
+ if(/butter/.test(n))return 60;
  if(/milk/.test(n))return 35;
  if(/curd/.test(n))return 40;
  return 25;

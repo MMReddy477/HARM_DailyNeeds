@@ -11,7 +11,7 @@ export async function GET() {
     const products=items.map(item=>{
       const category=item.category.toLowerCase();
       const department=departmentDirectory.find(d=>d.title.toLowerCase()===category || d.id===category)
-        || departmentDirectory.find(d=>d.id===(/notebook|note book/.test(category)?"notebooks":/gift/.test(category)?"gift-items":/print|xerox/.test(category)?"print-xerox":/transfer|aeps/.test(category)?"money-transfer":/office/.test(category)?"office-supplies":/dairy|daily|milk/.test(category)?"daily-needs":"school-supplies"))!;
+        || departmentDirectory.find(d=>d.id===(/notebook|note book/.test(category)?"notebooks":/gift/.test(category)?"gift-items":/print|xerox/.test(category)?"print-xerox":/transfer|aeps/.test(category)?"money-transfer":/office/.test(category)?"office-supplies":/dairy|milk/.test(category)?"milk-dairy":/drink|beverage/.test(category)?"cool-drinks":/daily/.test(category)?"daily-needs":"school-supplies"))!;
       return {key:item.id,name:item.name,department:department.title,id:department.id,price:item.price,unit:item.unit,image:item.image,description:`${item.name}${item.unit ? ` - ${item.unit}` : ""}`,aliases:item.category,available:item.stock>0};
     });
     return NextResponse.json({products},{headers:{"Cache-Control":"no-store"}});

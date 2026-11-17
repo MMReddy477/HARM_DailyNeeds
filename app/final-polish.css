@@ -1,0 +1,217 @@
+body {
+  background: #FAF8FF;
+}
+
+.reference-storefront:not(.public-dark) {
+  background: #FAF8FF;
+}
+
+.reference-storefront:not(.public-dark) .daily-store-hero {
+  background: linear-gradient(135deg, #F8F4FF 0%, #FFFFFF 50%, #FFF7ED 100%);
+}
+
+.reference-storefront:not(.public-dark) .home-live-products,
+.reference-storefront:not(.public-dark) .daily-collection-section,
+.reference-storefront:not(.public-dark) .daily-services,
+.reference-storefront:not(.public-dark) .premium-customer-reviews {
+  background: #FFFFFF;
+}
+
+.reference-storefront:not(.public-dark) .daily-collection-section.cool-drinks,
+.reference-storefront:not(.public-dark) .daily-gallery-section {
+  background: #FAF8FF;
+}
+
+.daily-store-footer {
+  background: #4C1D95;
+}
+
+.daily-hero-visual {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  height: auto;
+  min-height: 0;
+}
+
+.daily-hero-photo {
+  position: relative;
+  inset: auto;
+  display: flex;
+  min-width: 0;
+  min-height: 150px;
+  width: auto;
+  height: auto;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 10px;
+  transform: none;
+  border-radius: 16px;
+  box-shadow: 0 8px 22px #3a185912;
+}
+
+.daily-hero-photo > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  flex: 0 0 auto;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  padding: 4px;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.daily-hero-photo > span {
+  position: static;
+  display: flex;
+  min-height: 28px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 2px 0;
+  background: transparent;
+  color: #4C1D95;
+  font-size: 10px;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.daily-hero-photo > span > span {
+  display: grid;
+  gap: 2px;
+}
+
+.daily-hero-photo > span small {
+  color: #82708e;
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.daily-hero-copy h1 {
+  max-width: 620px;
+}
+
+.daily-hero-badges {
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.daily-hero-badges li {
+  min-height: 32px;
+  gap: 7px;
+  padding: 6px 10px;
+  border: 1px solid #eee7f8;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 11px;
+}
+
+.daily-hero-badges svg {
+  width: 15px;
+  height: 15px;
+  color: #4C1D95;
+}
+
+.daily-hero-photo > span {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.daily-hero-photo > span small {
+  font-size: 10px;
+}
+
+.daily-hero-hours {
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #fff 0%, #f5fff9 100%);
+  color: #13a578;
+}
+
+.daily-hero-hours-content {
+  display: grid;
+  flex: 1;
+  place-items: center;
+}
+
+.daily-hero-hours > span small {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 480px) {
+  .daily-hero-visual {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .daily-hero-photo {
+    min-height: 142px;
+  }
+}
+
+.shop-navigation.premium-navigation.daily-main-navigation {
+  background: #5B21B6;
+  color: #fff;
+}
+
+.daily-main-navigation > .shop-home-link,
+.daily-main-navigation .school-menu-label > a {
+  color: #fff;
+  font-weight: 600;
+  gap: 10px;
+}
+
+.daily-main-navigation > .shop-home-link {
+  padding-inline: 6px;
+}
+
+.daily-main-navigation .school-menu-label > a {
+  padding-left: 8px;
+}
+
+.daily-main-navigation .school-menu-label > button {
+  color: #fff;
+}
+
+.daily-nav-material-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  fill: currentColor;
+  transition: filter .18s ease;
+}
+
+.daily-nav-dropdown-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  transition: transform .18s ease;
+}
+
+.daily-main-navigation > .shop-home-link:hover,
+.daily-main-navigation > .shop-home-link:focus-visible,
+.daily-main-navigation .school-menu-label > a:hover,
+.daily-main-navigation .school-menu-label > a:focus-visible {
+  background-color: #ffffff12;
+  text-shadow: 0 0 8px #ffffff80;
+}
+
+.daily-main-navigation > .shop-home-link:hover .daily-nav-material-icon,
+.daily-main-navigation > .shop-home-link:focus-visible .daily-nav-material-icon,
+.daily-main-navigation .school-menu-label > a:hover .daily-nav-material-icon,
+.daily-main-navigation .school-menu-label > a:focus-visible .daily-nav-material-icon {
+  filter: drop-shadow(0 0 4px #ffffffaa);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .daily-nav-material-icon,
+  .daily-nav-dropdown-icon {
+    transition: none;
+  }
+}

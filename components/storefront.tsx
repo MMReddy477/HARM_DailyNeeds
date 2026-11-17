@@ -10,11 +10,12 @@ import { CustomerReviews } from "@/components/customer-reviews";
 import { FloatingContact } from "@/components/floating-contact";
 import { OpeningHours } from "@/components/opening-hours";
 import { HomeProducts } from "@/components/home-products";
+import { StoreGallery, StoreFooter, StoreTrustBar } from "@/components/daily-store-sections";
 import { ReferenceHeroServices } from "@/components/reference-home";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 
 const shopAddress = "2-2/30/201 My Abode the Sirius, Suryohayacolony, Bandlaguda Jagir 500086";
-const mapsQuery = `H.A.R DAILY NEEDS, ${shopAddress}`;
+const mapsQuery = `H.A.R.M DAILY NEEDS, ${shopAddress}`;
 const shopArea = "Bandlaguda Jagir, Hyderabad";
 
 
@@ -33,7 +34,7 @@ const revealWithDelay = (delay: number): Variants => ({
 
 function WhatsAppLink({ className, children }: { className: string; children: ReactNode }) {
   const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, "");
-  const href = number ? `https://wa.me/${number}?text=${encodeURIComponent("Hi H.A.R Daily Needs, I have an enquiry.")}` : "https://wa.me/918374778183";
+  const href = number ? `https://wa.me/${number}?text=${encodeURIComponent("Hi H.A.R.M Daily Needs, I have an enquiry.")}` : "https://wa.me/918374778183";
   return <a className={className} href={href} target="_blank" rel="noreferrer">{children}</a>;
 }
 
@@ -63,9 +64,9 @@ export function Storefront() {
       </div>
       <header className="site-header">
         <div className="section-shell nav-shell">
-          <Link className="logo-lockup" href="/" aria-label="H.A.R Daily Needs home">
-            <span className="logo-mark">H<span>.</span></span>
-            <span className="header-brand-copy"><strong>H.A.R DAILY NEEDS</strong><em className="header-brand-tagline">Stationery, Dairy &amp; Refreshing Drinks Under One Roof</em><small>Trusted by Families, Students &amp; Offices Since Day One</small></span>
+          <Link className="logo-lockup" href="/" aria-label="H.A.R.M Daily Needs home">
+            <span className="logo-mark"><img src="/brand/harm-icon.svg" alt="HM monogram" width={64} height={64}/></span>
+            <span className="header-brand-copy"><strong>H.A.R.M DAILY NEEDS</strong><em className="header-brand-tagline">Stationery, Dairy &amp; Refreshing Drinks Under One Roof</em><small>Trusted by Families, Students &amp; Offices Since Day One</small></span>
           </Link>
           <button className="mobile-menu-toggle" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
           <ShopNavigation mobileOpen={menuOpen} onNavigate={closeMenu} />
@@ -76,11 +77,16 @@ export function Storefront() {
         </div>
       </header>
 
+      <StoreTrustBar />
       <ReferenceHeroServices />
 
       <HomeProducts />
 
+      <StoreGallery />
+
       <CustomerReviews />
+
+      <StoreFooter />
 
 
 

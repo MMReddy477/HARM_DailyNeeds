@@ -1,15 +1,7 @@
+import { printServices } from "@/lib/print-services";
 import { canonicalProductName, mergePublicProducts } from "@/lib/product-search";
 
-export const printCounterRates = [
-  { name: "Black & White Xerox (A4)", aliases: ["Black & White Xerox", "B/W Xerox"], price: 2, unit: "page", description: "Everyday document photocopies." },
-  { name: "Colour Xerox (A4)", aliases: ["Color Xerox", "Colour Xerox"], price: 10, unit: "page", description: "Colour copies for documents and projects." },
-  { name: "Document Printout", aliases: ["A4 Printing", "Printouts"], price: 3, unit: "page", description: "USB, email or WhatsApp documents." },
-  { name: "Colour Printout", aliases: ["Color Printout"], price: 15, unit: "page", description: "Colour documents and presentations." },
-  { name: "Document Scanning", aliases: ["Scanning"], price: 10, unit: "document", description: "Digital copies of documents." },
-  { name: "Lamination", aliases: [], price: 30, unit: "sheet", description: "Protect documents and certificates." },
-  { name: "Spiral Binding", aliases: ["Spiral binding"], price: 50, unit: "book", description: "Finish projects and reports neatly." },
-  { name: "Photo Printing", aliases: [], price: 40, unit: "order", description: "Confirm photo size, finish and quantity." }
-];
+export const printCounterRates = printServices.map(service=>({...service,unit:service.unit||(/Binding/.test(service.name)?"book":/Lamination/.test(service.name)?"sheet":"order")}));
 export const stationeryCounterNames = ["Blue Ball Pen", "Black Gel Pen", "Long Notebook - 100 Pages", "Long Notebook - 200 Pages", "Short Notebook - 100 Pages", "Geometry Box", "Display File", "A4 Paper Pack", "Staplers", "Nataraj Pencil Pack"];
 
 export type CounterInventoryItem = { id: string; name: string; category: string; price: number; unit: string; image: string; stock: number };

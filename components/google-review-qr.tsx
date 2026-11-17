@@ -1,24 +1,37 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Download, ExternalLink, QrCode } from "lucide-react";
+import { Check, Copy, ExternalLink, Star } from "lucide-react";
 import { googleReviewTarget } from "@/lib/google-reviews";
-
-export function GoogleReviewQR({ kind = "google" }: { kind?: "google" | "shop" }) {
-  const target = googleReviewTarget();
-  const [reviewUrl, setReviewUrl] = useState("/reviews#write-review");
-  const [local, setLocal] = useState(false);
+export function GoogleReviewQR() {
+  const { url, direct } = googleReviewTarget();
+  const [shareUrl, setShareUrl] = useState(direct ? url : "");
+  const [status, setStatus] = useState("");
+  const [manualCopy, setManualCopy] = useState(false);
   useEffect(() => {
-    if (kind !== "shop") return;
-    setLocal(/^(localhost|127\.|192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(window.location.hostname));
+    if (direct) return;
     let active = true;
-    void fetch("/api/review-qr?kind=shop&format=json").then(r => r.json()).then(data => { if (active && data.url) setReviewUrl(data.url); }).catch(() => {});
+    void fetch("/api/review-qr?format=json").then(response => response.json()).then(data => { if (active && data.url) setShareUrl(data.url); }).catch(() => {});
     return () => { active = false; };
-  }, [kind]);
-  if (kind === "shop") return <aside className="google-qr-card" aria-label="Shop review QR code"><a className="google-qr-image" href={reviewUrl}><img src="/api/review-qr?kind=shop" alt="Scan to write a review for H.A.R DAILY NEEDS on our website" width={220} height={220} loading="lazy"/></a><div><span className="eyebrow"><QrCode size={15}/>SCAN &amp; REVIEW</span><h3>Scan to Write a Shop Review</h3><p>Open your phone camera, scan this QR and submit your name, star rating and review directly to our website. No Google link is needed.</p><p className="google-qr-note">Reviews appear after approval. Website submissions are separate from Google reviews.</p>{local && <p className="google-qr-note">Local preview: your phone must be on the same Wi-Fi as this computer, and this computer must allow local network access to port 3000. Keep the website running. Use a public website address for customers outside your Wi-Fi.</p>}<div className="google-qr-actions"><a href={reviewUrl}>Write a Shop Review<ExternalLink size={14}/></a><a href="/api/review-qr?kind=shop&download=1" download="harm-shop-review-qr.png"><Download size={14}/>Download Review QR</a></div></div></aside>;
-  return <aside className="google-qr-card" aria-label="Google Maps QR code">
-    <a className="google-qr-image" href={target.url} target="_blank" rel="noreferrer"><img src="/api/review-qr" alt={target.direct ? "Scan to open our Google review link" : "Scan to find H.A.R DAILY NEEDS on Google Maps"} width={220} height={220} loading="lazy"/></a>
-    <div><span className="eyebrow"><QrCode size={15}/>SCAN &amp; CONNECT</span><h3>{target.direct ? "Share your experience on Google" : "Scan to find us on Google Maps"}</h3><p>{target.direct ? "Scan with your phone camera, open the Google link and submit your honest review." : "Scan with your phone camera to search for H.A.R DAILY NEEDS at our Bandlaguda Jagir address."}</p>
-    {!target.direct && <p className="google-qr-note">This QR opens a Maps search. Once our shop listing is available, select it and choose Write a review.</p>}
-    <div className="google-qr-actions"><a href={target.url} target="_blank" rel="noreferrer">{target.direct ? "Open Google review link" : "Open Google Maps"}<ExternalLink size={14}/></a><a href="/api/review-qr?download=1" download="harm-google-maps-qr.png"><Download size={14}/>Download QR</a></div></div>
+  }, [direct]);
+  async function copyLink() {
+    setManualCopy(false);
+    const value = shareUrl || new URL(url, window.location.origin).href;
+    setShareUrl(value);
+    try {
+      if (!navigator.clipboard?.writeText) throw Error("Clipboard unavailable");
+      await navigator.clipboard.writeText(value);
+      setStatus("Review link copied. Thank you for spreading the word!");
+    } catch {
+      setManualCopy(true);
+      setStatus("Select and copy the review link below.");
+    }
+  }
+  return <aside className="google-qr-card premium-review-qr" aria-labelledby="google-review-qr-title">
+    <a className="google-qr-image" href={url} target={direct ? "_blank" : undefined} rel={direct ? "noreferrer" : undefined} aria-label={direct ? "Open our Google review link" : "Open the shop review form"}><img src="/api/review-qr" alt={direct ? "QR code for the H.A.R.M Daily Needs Google review link" : "QR code to write a review on the H.A.R.M Daily Needs website"} width={220} height={220} loading="lazy"/></a>
+    <div className="premium-review-qr-copy"><span className="eyebrow">YOUR FEEDBACK MAKES A DIFFERENCE</span><h3 id="google-review-qr-title"><Star size={23} fill="currentColor" aria-hidden="true"/>{direct ? "Scan to Review Us on Google" : "Scan to Review Our Shop"}</h3><p>{direct ? "Love our service? Scan this QR code and leave a Google Review. Your feedback helps our local business grow." : "Love our service? Scan this QR code and share your experience on our website. Your feedback helps our local business grow."}</p>
+      <div className="google-qr-actions"><a className="review-primary-cta" href={url} target={direct ? "_blank" : undefined} rel={direct ? "noreferrer" : undefined}>{direct ? "Leave Google Review" : "Leave a Shop Review"}<ExternalLink size={16}/></a><button type="button" onClick={copyLink}><Copy size={16}/>Copy Review Link</button></div>
+      {status && <p className="review-copy-status" role="status">{manualCopy ? <Copy size={15} aria-hidden="true"/> : <Check size={15} aria-hidden="true"/>}{status}</p>}
+      {manualCopy && <input className="google-review-copy-input" aria-label="Review link to copy" value={shareUrl} readOnly onFocus={event => event.currentTarget.select()}/>}
+    </div>
   </aside>;
 }
