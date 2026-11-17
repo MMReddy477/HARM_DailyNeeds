@@ -5,10 +5,16 @@ export type InventoryRecord = {
   name: string;
   category: string;
   price: number;
+  costPrice?: number;
   stock: number;
   reorderLevel: number;
   unit: string;
   image: string;
+  brand?: string;
+  description?: string;
+  status?: "Active" | "Inactive";
+  featured?: boolean;
+  expiryDate?: Date | null;
 };
 
 export type SaleRecordData = {
@@ -18,6 +24,18 @@ export type SaleRecordData = {
   amount: number;
   quantity: number;
   note: string;
+  costAmount?: number;
+  profit?: number;
+  transactionId?: string;
+  customerName?: string;
+  occurredAt: Date;
+};
+
+export type ExpenseRecordData = {
+  id: string;
+  description: string;
+  category: string;
+  amount: number;
   occurredAt: Date;
 };
 
@@ -37,10 +55,16 @@ const inventorySchema = new Schema<InventoryRecord>({
   name: { type: String, required: true, trim: true, maxlength: 100 },
   category: { type: String, required: true, trim: true, maxlength: 50 },
   price: { type: Number, min: 0, default: 0 },
+  costPrice: { type: Number, min: 0, default: 0 },
   stock: { type: Number, required: true, min: 0, default: 0 },
   reorderLevel: { type: Number, min: 0, default: 5 },
   unit: { type: String, trim: true, maxlength: 24, default: "piece" },
-  image: { type: String, trim: true, maxlength: 1400000, default: "" }
+  image: { type: String, trim: true, maxlength: 1400000, default: "" },
+  brand: { type: String, trim: true, maxlength: 80, default: "" },
+  description: { type: String, trim: true, maxlength: 500, default: "" },
+  status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
+  featured: { type: Boolean, default: false },
+  expiryDate: { type: Date, default: null }
 }, { timestamps: true });
 
 const saleSchema = new Schema<SaleRecordData>({
@@ -50,6 +74,18 @@ const saleSchema = new Schema<SaleRecordData>({
   amount: { type: Number, required: true, min: 0 },
   quantity: { type: Number, min: 1, default: 1 },
   note: { type: String, trim: true, maxlength: 200, default: "" },
+  costAmount: { type: Number, min: 0 },
+  profit: { type: Number },
+  transactionId: { type: String, trim: true, maxlength: 80, default: "" },
+  customerName: { type: String, trim: true, maxlength: 100, default: "" },
+  occurredAt: { type: Date, default: Date.now }
+});
+
+const expenseSchema = new Schema<ExpenseRecordData>({
+  id: { type: String, required: true, unique: true, index: true },
+  description: { type: String, required: true, trim: true, maxlength: 160 },
+  category: { type: String, required: true, trim: true, maxlength: 50 },
+  amount: { type: Number, required: true, min: 0 },
   occurredAt: { type: Date, default: Date.now }
 });
 
@@ -70,3 +106,5 @@ export const SaleRecord = (models.SaleRecord as Model<SaleRecordData> | undefine
   || model<SaleRecordData>("SaleRecord", saleSchema);
 export const TransferRecord = (models.TransferRecord as Model<TransferRecordData> | undefined)
   || model<TransferRecordData>("TransferRecord", transferSchema);
+export const ExpenseRecord = (models.ExpenseRecord as Model<ExpenseRecordData> | undefined)
+  || model<ExpenseRecordData>("ExpenseRecord", expenseSchema);
