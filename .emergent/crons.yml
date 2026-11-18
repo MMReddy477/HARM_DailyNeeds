@@ -1,0 +1,25 @@
+crons:
+  - name: closing-report
+    description: "Builds the nightly store closing report and emails it to the owner at 11 PM IST"
+    cron: "0 23 * * *"
+    timezone: "Asia/Kolkata"
+    endpoint: "{{BASE_URL}}/api/cron/closing-report"
+    method: POST
+    # Cron endpoints must ack 2xx immediately; enqueue/background the actual work.
+    enabled: true
+  - name: morning-stock
+    description: "Emails the owner the low-stock milk, dairy and cool drink items at 7 AM IST"
+    cron: "0 7 * * *"
+    timezone: "Asia/Kolkata"
+    endpoint: "{{BASE_URL}}/api/cron/morning-stock"
+    method: POST
+    # Cron endpoints must ack 2xx immediately; enqueue/background the actual work.
+    enabled: true
+  - name: milk-list
+    description: "Locks in tomorrow's milk subscriptions and emails the owner the milk list at 9 PM IST"
+    cron: "0 21 * * *"
+    timezone: "Asia/Kolkata"
+    endpoint: "{{BASE_URL}}/api/cron/milk-list"
+    method: POST
+    # Cron endpoints must ack 2xx immediately; enqueue/background the actual work.
+    enabled: true

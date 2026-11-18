@@ -1,0 +1,352 @@
+{
+  "theme": "light",
+  "archetype": "THE HYBRID RETAIL EXPERT (Royal Purple & Gold / Modern Indian Superstore)",
+  "colors": {
+    "brand_primary": "#581C87",
+    "brand_primary_hover": "#491270",
+    "brand_deep_purple": "#3B0764",
+    "brand_light_purple": "#FAF5FF",
+    "brand_purple_border": "#E9D5FF",
+    "brand_accent_amber": "#D97706",
+    "brand_accent_gold": "#F59E0B",
+    "brand_emerald_badge": "#059669",
+    "surfaces": [
+      {
+        "name": "page",
+        "kind": "solid",
+        "bg": "#F8FAFC",
+        "on_bg": "#0F172A",
+        "on_bg_muted": "#475569",
+        "roles": {
+          "link": "#581C87",
+          "error": "#DC2626",
+          "success": "#059669"
+        }
+      },
+      {
+        "name": "panel",
+        "kind": "solid",
+        "bg": "#FFFFFF",
+        "on_bg": "#0F172A",
+        "on_bg_muted": "#475569",
+        "roles": {
+          "link": "#581C87",
+          "error": "#DC2626",
+          "success": "#059669"
+        }
+      },
+      {
+        "name": "purple_hero_card",
+        "kind": "solid",
+        "bg": "#3B0764",
+        "on_bg": "#FFFFFF",
+        "on_bg_muted": "#E9D5FF",
+        "roles": {
+          "link": "#FDE047",
+          "error": "#FCA5A5",
+          "success": "#6EE7B7"
+        }
+      },
+      {
+        "name": "header_nav",
+        "kind": "glass",
+        "contrast_against": "#FFFFFF",
+        "guarantee": "backdrop-blur-xl bg-white/95 border-b border-purple-100",
+        "on_bg": "#1E1B4B",
+        "on_bg_muted": "#64748B",
+        "roles": {
+          "link": "#581C87",
+          "error": "#DC2626",
+          "success": "#059669"
+        }
+      },
+      {
+        "name": "inverse_footer",
+        "kind": "solid",
+        "bg": "#1E1B4B",
+        "on_bg": "#FFFFFF",
+        "on_bg_muted": "#CBD5E1",
+        "roles": {
+          "link": "#FBBF24",
+          "error": "#FCA5A5",
+          "success": "#86EFAC"
+        }
+      },
+      {
+        "name": "accent_badge",
+        "kind": "solid",
+        "bg": "#FAF5FF",
+        "on_bg": "#581C87",
+        "on_bg_muted": "#6B21A8"
+      },
+      {
+        "name": "gold_badge",
+        "kind": "solid",
+        "bg": "#FEF3C7",
+        "on_bg": "#92400E",
+        "on_bg_muted": "#B45309"
+      },
+      {
+        "name": "admin_sidebar",
+        "kind": "solid",
+        "bg": "#2E1065",
+        "on_bg": "#FAF5FF",
+        "on_bg_muted": "#DDD6FE",
+        "roles": {
+          "link": "#FBBF24",
+          "error": "#F87171",
+          "success": "#34D399"
+        }
+      }
+    ],
+    "accent": "#F59E0B",
+    "on_accent": "#000000"
+  },
+  "typography": {
+    "font_family_heading": "Plus Jakarta Sans Variable",
+    "font_family_body": "DM Sans Variable",
+    "import_statement": "@import '@fontsource-variable/plus-jakarta-sans'; @import '@fontsource-variable/dm-sans';",
+    "scale_px": {
+      "display": 56,
+      "h1": 44,
+      "h2": 32,
+      "h3": 22,
+      "body": 16,
+      "caption": 14
+    },
+    "guidelines": "Hero text text-4xl sm:text-5xl font-bold tracking-tight. Section headings text-2xl sm:text-3xl font-bold text-slate-900. Body text text-base text-slate-600 leading-relaxed. Indian Rupee symbol format with ₹ consistently (e.g. ₹1+, ₹40, ₹150)."
+  },
+  "entry_surfaces": {
+    "/": "split hero with royal purple banner, brand guarantee badge, instant quick-action floating pill, seeded stationery grid showcase",
+    "/stationery": "categorized stationery grid with brand filter tabs (DOMS, Camlin, Classmate, Faber-Castell)",
+    "/notebooks": "ruled/unruled/long-book category catalogue with size specs & paper weight breakdown",
+    "/office-supplies": "b2b & retail office essentials layout with registers, calculators, folders, desk organizers",
+    "/daily-needs": "quick-grab FMCG & tech accessories grid (snacks, drinks, batteries, chargers, earphones)",
+    "/services": "featured 8 core service cards with real photography, Xerox rate table & money transfer disclaimer badge",
+    "/print-xerox": "live rate card calculator for B&W Xerox, Color Xerox, Binding, Lamination & Photo Printing",
+    "/reviews": "verified Google reviews rating summary with interactive feedback submission modal",
+    "/location": "detailed Google Map embed with My Abode The Sirius directions, store timings & call/WhatsApp triggers",
+    "/admin/login": "branded split owner portal with security badge, PIN/password entry & inventory system preview",
+    "/admin/dashboard": "dense owner control center with inventory manager, revenue tracking, Xerox/Printing logger, and Excel/PDF report export"
+  },
+  "visual_enhancers": {
+    "border_styles": "1px solid border-purple-100 and border-slate-200 with soft hover border-purple-400",
+    "shadows": "shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-200",
+    "glassmorphism": "backdrop-blur-xl bg-white/90 border border-white/60",
+    "badges": "rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider"
+  },
+  "mega_menu_architecture": {
+    "Stationery": [
+      {"name": "Pens & Writing", "items": ["Ball Pens", "Gel Pens", "Fountain Pens", "Highlighters", "Whiteboard Markers", "Permanent Markers"], "brands": ["Cello", "Reynolds", "DOMS", "Camlin"]},
+      {"name": "Geometry & Math", "items": ["Mathematical Instrument Boxes", "Rulers & Scales", "Protractors & Set Squares", "Compass Sets"], "brands": ["Camlin", "DOMS", "Classmate"]},
+      {"name": "Files & Folders", "items": ["Clear Book Display Files", "Ring Binders", "Report Files", "Document Envelopes", "Folder Dividers"], "brands": ["Solo", "Classic"]},
+      {"name": "Art & Craft", "items": ["Oil Pastels", "Wax Crayons", "Water Colours", "Acrylic Paints", "Canvas Boards", "Craft Glue & Clay"], "brands": ["Faber-Castell", "Camlin", "DOMS"]},
+      {"name": "Office Accessories", "items": ["Kangaro Staplers & Pins", "Punching Machines", "Tape Dispensers", "Scissors & Cutters", "Sticky Notes & Flags"], "brands": ["Kangaro", "3M Post-it"]},
+      {"name": "Papers & Labels", "items": ["JK Copier A4 Sheets", "Color Craft Sheets", "Label Stickers", "Chart Papers", "Tracing Sheets"], "brands": ["JK Paper", "Century"]}
+    ],
+    "Note Books": [
+      {"name": "Long Books", "items": ["Classmate King Size 172 Pgs", "Navneet Long Notebooks", "Softcover A4 Long", "Hardcover Long 240 Pgs"], "brands": ["Classmate", "Navneet"]},
+      {"name": "School Notes", "items": ["Single Ruled 172 Pgs", "Double Ruled 172 Pgs", "Four Line Ruled", "Square Ruled Math Books", "Broad Ruled"], "brands": ["Classmate", "DOMS"]},
+      {"name": "Records & Practical", "items": ["Science Practical Records", "Physics / Chemistry Lab Books", "Computer Record Books", "Biology Record with Sheets"], "brands": ["Navneet", "Sundaram"]},
+      {"name": "Graph & Drawing", "items": ["Graph Note Books", "Classmate Drawing Book A3/A4", "Artists Sketchpad Spiral", "Cartridge Sheet Books"], "brands": ["Classmate", "DOMS", "Camlin"]},
+      {"name": "Spiral Binding Books", "items": ["Executive Spiral Note Pads", "Subject Dividers Spiral Notebooks", "Pocket Spiral Diaries", "College Ruled Spiral Notebooks"], "brands": ["Classmate Pulse", "Solo"]}
+    ],
+    "Office Supplies": [
+      {"name": "Registers & Ledgers", "items": ["Staff Attendance Register", "General Ledger Book 200/400 Pgs", "Cash Book Double Column", "Petty Cash Registers", "Visitor Log Book"], "brands": ["Standard", "Eagle"]},
+      {"name": "Invoice & Receipt Books", "items": ["Tax Invoice Bill Books (Duplicate/Triplicate)", "Money Receipt Voucher", "Challan Books", "Rent Receipt Pads"], "brands": ["Falcon", "Local Press"]},
+      {"name": "Office Filing & Storage", "items": ["Box Files & Lever Arch Files", "Accordion Expandable Files", "Cheque Book Organizers", "Card Holders"], "brands": ["Solo", "Deli"]},
+      {"name": "Calculators & Desk Essentials", "items": ["Casio MJ-120D Plus Desktop Calculator", "Citizen 12-Digit Basic Calculator", "Casio Scientific fx-991CW", "Desk Pen Stands & Organizers"], "brands": ["Casio", "Citizen"]}
+    ]
+  },
+  "featured_services_spec": [
+    {
+      "id": "stationery-store",
+      "title": "Stationery Superstore",
+      "badge": "Top Brands",
+      "description": "Premium school & college stationery from Classmate, Navneet, DOMS, Camlin, Faber-Castell & Reynolds.",
+      "image": "https://images.unsplash.com/photo-1501618669935-18b6ecb13d6d?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "cta": "Explore Stationery"
+    },
+    {
+      "id": "notebooks-hub",
+      "title": "Note Books & Registers",
+      "badge": "All Sizes",
+      "description": "Complete range of Long books, practical record notebooks, spiral pads, graph sheets and project files.",
+      "image": "https://images.unsplash.com/photo-1603188389888-7b80bd0a7e3e?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "cta": "Browse Books"
+    },
+    {
+      "id": "office-supplies",
+      "title": "Office & Commercial Supplies",
+      "badge": "Business Grade",
+      "description": "Attendance registers, ledger & cash books, invoice bill books, Casio calculators and Solo filing systems.",
+      "image": "https://images.unsplash.com/photo-1625225233840-695456021cde?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "cta": "View Office Gear"
+    },
+    {
+      "id": "xerox-center",
+      "title": "Fast Xerox & Copy Center",
+      "badge": "Starts ₹1/-",
+      "description": "High-speed high-clarity black & white photocopying and vibrant colour Xerox for single and bulk documents.",
+      "image": "https://images.unsplash.com/photo-1778330103283-cff9ada3d7b2?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "cta": "Check Rates"
+    },
+    {
+      "id": "printing-services",
+      "title": "Document & Photo Printing",
+      "badge": "Immediate",
+      "description": "A4/A3 laser prints, project report printouts, glossy passport photo printing, glossy photo enlargements.",
+      "image": "https://images.pexels.com/photos/9550363/pexels-photo-9550363.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "cta": "Print Services"
+    },
+    {
+      "id": "binding-lamination",
+      "title": "Spiral Binding & Lamination",
+      "badge": "Professional",
+      "description": "Heavy-duty thermal & pouch lamination for ID cards/certificates, plastic comb & metal spiral book binding.",
+      "image": "https://images.pexels.com/photos/9574509/pexels-photo-9574509.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "cta": "Binding Options"
+    },
+    {
+      "id": "gift-shop",
+      "title": "Gift Articles & Toys",
+      "badge": "Celebration",
+      "description": "Pen gift sets, birthday return gifts, decorative stationery, creative art kits, greeting cards & wrappers.",
+      "image": "https://images.pexels.com/photos/7657387/pexels-photo-7657387.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "cta": "Explore Gifts"
+    },
+    {
+      "id": "money-transfer",
+      "title": "Domestic Money Transfer Services",
+      "badge": "Store Counter",
+      "description": "Quick & secure direct bank money transfer assistance at store counter. Immediate transaction receipts provided.",
+      "disclaimer": "Store counter service only — no online payment gateway on website.",
+      "image": "https://images.unsplash.com/photo-1648201637025-1c77b9be3013?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "cta": "Counter Info"
+    },
+    {
+      "id": "daily-needs",
+      "title": "Daily Needs & Tech Essentials",
+      "badge": "Everyday Care",
+      "description": "Snacks, chocolates, mineral water, high-drain batteries, USB flash drives, OTG adapters, earphones & charging cables.",
+      "image": "https://images.pexels.com/photos/17065769/pexels-photo-17065769.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "cta": "Explore Daily Needs"
+    }
+  ],
+  "print_xerox_rates": [
+    {"service": "Black & White Xerox (A4)", "rate": "₹1+", "unit": "per page", "desc": "Single/double side laser copy on 75 GSM paper"},
+    {"service": "Color Xerox (A4)", "rate": "₹5+", "unit": "per page", "desc": "High definition colour photocopy"},
+    {"service": "Document Laser Printout", "rate": "₹2+", "unit": "per page", "desc": "From USB, Email or WhatsApp doc submission"},
+    {"service": "A4 / A3 Color Printout", "rate": "₹10+", "unit": "per page", "desc": "Vibrant presentation and project printing"},
+    {"service": "Document Scanning (High-Res)", "rate": "₹10+", "unit": "per document", "desc": "Direct PDF to email / WhatsApp / Flash drive"},
+    {"service": "Hot Pouch Lamination (A4/A3)", "rate": "₹20+", "unit": "per sheet", "desc": "Waterproof sealing for certificates & ID cards"},
+    {"service": "Spiral & Wire-O Binding", "rate": "₹40+", "unit": "per book", "desc": "Includes transparent front cover & dark back sheet"},
+    {"service": "Passport Size Photo Printing", "rate": "₹20+", "unit": "set of 8", "desc": "Studio quality glossy photo paper"}
+  ],
+  "image_urls": {
+    "hero_stationery": {
+      "url": "https://images.unsplash.com/photo-1501618669935-18b6ecb13d6d?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "H.A.R.M Daily Needs Stationery & Pens",
+      "category": "Hero and Branding"
+    },
+    "stationery_flatlay": {
+      "url": "https://images.pexels.com/photos/7657387/pexels-photo-7657387.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "alt": "School & Art Essentials Flatlay",
+      "category": "Product Showcase"
+    },
+    "notebooks_showcase": {
+      "url": "https://images.unsplash.com/photo-1603188389888-7b80bd0a7e3e?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "Classmate & Navneet Premium Notebooks",
+      "category": "Notebooks Category"
+    },
+    "art_materials_jars": {
+      "url": "https://images.unsplash.com/photo-1510936994138-07e06c7c5add?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "DOMS & Camlin Colour Pencils and Markers",
+      "category": "Stationery Products"
+    },
+    "office_desk_calculator": {
+      "url": "https://images.unsplash.com/photo-1625225233840-695456021cde?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "Casio Desk Calculator & Accounts Registers",
+      "category": "Office Supplies"
+    },
+    "office_filing_folders": {
+      "url": "https://images.pexels.com/photos/17065769/pexels-photo-17065769.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "alt": "Solo Display Files and Document Organizers",
+      "category": "Office Filing"
+    },
+    "commercial_xerox_press": {
+      "url": "https://images.unsplash.com/photo-1778330103283-cff9ada3d7b2?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "H.A.R.M Local Store Xerox Counter",
+      "category": "Print & Xerox"
+    },
+    "industrial_printer_workshop": {
+      "url": "https://images.pexels.com/photos/9550363/pexels-photo-9550363.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "alt": "High Speed Document Printing Machinery",
+      "category": "Print & Xerox"
+    },
+    "digital_workstation_printing": {
+      "url": "https://images.pexels.com/photos/9574509/pexels-photo-9574509.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "alt": "Document Scanning & Processing Workstation",
+      "category": "Services"
+    }
+  },
+  "store_metadata": {
+    "name": "H.A.R.M DAILY NEEDS",
+    "tagline": "Trusted by Families, Students & Offices Since Day One",
+    "address_full": "H.A.R.M DAILY NEEDS, 2-2/30/201, My Abode The Sirius, Suryodhaya Colony, Bandlaguda Jagir, Hyderabad, Telangana – 500086",
+    "timings": "Open Daily: 8:00 AM – 10:00 PM (Monday to Sunday)",
+    "phone": "+91 98765 43210",
+    "whatsapp": "+91 98765 43210",
+    "google_maps_embed_query": "My Abode The Sirius, Bandlaguda Jagir, Hyderabad, Telangana 500086",
+    "google_rating": 4.9,
+    "total_reviews": 184
+  },
+  "google_business_actions": [
+    {"label": "Call Store", "action": "tel:+919876543210", "icon": "PhoneCall", "testId": "google-btn-call"},
+    {"label": "WhatsApp Us", "action": "https://wa.me/919876543210?text=Hi%20HARM%20Daily%20Needs,%20I%20have%20an%20inquiry", "icon": "MessageCircle", "testId": "google-btn-whatsapp"},
+    {"label": "Get Directions", "action": "https://maps.google.com/?q=My+Abode+The+Sirius+Bandlaguda+Jagir+Hyderabad", "icon": "Navigation", "testId": "google-btn-directions"},
+    {"label": "Write a Review", "action": "#review-modal", "icon": "Star", "testId": "google-btn-review"},
+    {"label": "Share Location", "action": "share", "icon": "Share2", "testId": "google-btn-share"}
+  ],
+  "admin_portal_spec": {
+    "role": "Owner Admin Only (Protected by PIN / Credentials)",
+    "access_entry": "Owner Login button in top header/footer with secure dialog",
+    "dashboard_modules": [
+      {
+        "id": "inventory",
+        "title": "Inventory Management",
+        "features": ["Add Product", "Edit Price & Stock", "Delete Product", "Low Stock Alerts badge (< 5 units)", "Filter by Category & Brand", "Instant Search"]
+      },
+      {
+        "id": "revenue_logger",
+        "title": "Daily Services Revenue Log",
+        "features": ["Record Xerox Revenue (B&W / Color)", "Record Printing & Scanning Revenue", "Record Spiral Binding & Lamination Counts", "Record Money Transfer Service Commission Logs", "Daily & Monthly Totals Calculation"]
+      },
+      {
+        "id": "analytics",
+        "title": "Sales Analytics & Reports",
+        "features": ["Recharts Revenue Chart (Daily / Weekly trends)", "Category-wise Sales Distribution", "Top-selling Products Leaderboard", "Export full catalog to Excel (.xlsx)", "Export summary statement to PDF"]
+      }
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Retain the royal purple branding (#581C87 / #3B0764 / #FAF5FF) and gold/amber highlights (#F59E0B) as requested. Do not change the logo or the brand tagline 'Trusted by Families, Students & Offices Since Day One'.",
+    "Replace any generic graphics with provided high quality photography URLs from unsplash/pexels in this guideline.",
+    "Implement real products with Indian brands: Classmate, Navneet, DOMS, Camlin, Apsara, Nataraj, Cello, Reynolds, Faber-Castell, Kangaro, Casio, Solo, JK Paper.",
+    "Every product card must show: Product Image, Product Name, Category, Starting Price (₹), and 'Available In Store' badge with quick WhatsApp Inquiry button.",
+    "Build the 3-category Mega Menus (Stationery, Note Books, Office Supplies) with rich brand tags and quick category jump links.",
+    "Create the Print & Xerox rate calculator so students and office staff can select B&W/Color Xerox, copies, lamination, and binding to see instant estimated cost.",
+    "Ensure Money Transfer is clearly labeled as an in-store counter service with receipt assistance (display/info only, no payment gateway).",
+    "Include floating Quick Contact Bar (Call, WhatsApp, Directions, Write Review) optimized for mobile and desktop shoppers.",
+    "Provide interactive Customer Reviews section with average rating (4.9/5 stars) and a working review submission form that stores reviews in MongoDB.",
+    "Create the Owner Admin Panel with password/PIN modal login. Ensure it includes full CRUD for products, low stock indicator, daily Xerox/Printing revenue logger, Recharts analytics, and Excel/PDF download functions (using openpyxl/jspdf/backend API).",
+    "Add data-testid attributes to all buttons, navigation items, forms, tabs, inputs, and search fields for automated verification."
+  ],
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
+    "Avoid generic centered layouts. Use layered depth, generous padding (p-6, p-8, p-12), and crisp borders (border-purple-100).",
+    "Use glass-morphism effects on header nav (backdrop-blur-xl bg-white/95) with high contrast purple text.",
+    "Use specific CSS transitions (transition: transform 0.2s ease, opacity 0.2s ease) and do not apply universal transition: all.",
+    "Display Indian Rupee symbol '₹' cleanly on all pricing cards and calculators.",
+    "All interactive elements must include a data-testid attribute in kebab-case."
+  ]
+}

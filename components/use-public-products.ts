@@ -1,9 +1,0 @@
-﻿"use client";
-import { useSyncExternalStore } from "react";
-import { mergePublicProducts, type PublicProduct } from "@/lib/product-search";
-const initial={products:mergePublicProducts([]),notice:"Starting prices are indicative; confirm the final price in store."};
-let snapshot=initial;let pending:Promise<void>|null=null;let lastFetch=0;const listeners=new Set<()=>void>();
-export function refreshPublicProducts(force=false){if(pending)return pending;if(!force&&Date.now()-lastFetch<3000)return Promise.resolve();lastFetch=Date.now();pending=fetch('/api/products',{cache:'no-store'}).then(async response=>{const result=await response.json();if(!response.ok)throw Error();snapshot={products:mergePublicProducts(result.products),notice:"Saved shop prices take priority. Starting prices are indicative retail estimates."};listeners.forEach(listener=>listener());}).catch(()=>{}).finally(()=>{pending=null;});return pending;}
-function subscribe(listener:()=>void){listeners.add(listener);if(listeners.size===1){void refreshPublicProducts();window.addEventListener('focus',onRefresh);window.addEventListener('storage',onStorage);window.addEventListener('harm-products-updated',onRefresh);timer=window.setInterval(onRefresh,15000);}return()=>{listeners.delete(listener);if(!listeners.size){window.removeEventListener('focus',onRefresh);window.removeEventListener('storage',onStorage);window.removeEventListener('harm-products-updated',onRefresh);window.clearInterval(timer);}};}
-let timer:number|undefined;const onRefresh=()=>{if(document.visibilityState!=='hidden')void refreshPublicProducts(true);};const onStorage=(event:StorageEvent)=>{if(event.key==='harm-products-updated')onRefresh();};
-export function usePublicProducts():{products:PublicProduct[];notice:string}{return useSyncExternalStore(subscribe,()=>snapshot,()=>initial);}
