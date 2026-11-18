@@ -38,6 +38,10 @@ The checked-in `render.yaml` deploys a single Docker web service so the Node fro
 
 In the Render service environment, provide `MONGO_URL`, `HARM_ADMIN_USERNAME`, and `HARM_ADMIN_PASSWORD`. The Blueprint sets `DB_NAME=harm_daily_needs` and `APP_TZ=Asia/Kolkata`. Configure a reachable MongoDB instance separately; the repository does not include one.
 
+At startup, the backend accepts `MONGO_URL` or `MONGODB_URI` and logs which variable it selected, plus the MongoDB host and database name. It runs a MongoDB ping before starting the service; connection failures include a traceback in the Render logs, but never log the connection URI.
+
+If Atlas connectivity fails, verify that the URI uses a MongoDB **database user's** username/password (not Atlas website credentials), URL-encode special characters in the password, and allow the Render service's outbound IP address or addresses in Atlas **Network Access**. Use Render's static outbound IPs when available; avoid leaving Atlas open to all IPs.
+
 ## Deployment diagnostics
 
 The missing-root-`package.json` error is addressed by the root workspace manifest and lockfile. If a deploy reports that file missing again, verify the Render Root Directory is `.` and that the deployment is using the latest commit on the intended branch. Do not configure a Publish Directory for this Docker web service.

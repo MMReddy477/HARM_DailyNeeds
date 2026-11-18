@@ -3,6 +3,7 @@
 import logging
 import os
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -10,11 +11,51 @@ from pymongo import ASCENDING, DESCENDING, IndexModel
 
 load_dotenv(Path(__file__).parent.parent / ".env")
 
-mongo_url = os.environ["MONGO_URL"]
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ["DB_NAME"]]
-
 logger = logging.getLogger(__name__)
+
+mongo_url = os.getenv("MONGO_URL") or os.getenv("MONGODB_URI")
+if not mongo_url:
+    raise RuntimeError("Set either MONGO_URL or MONGODB_URI to connect to MongoDB.")
+
+mongo_env_name = "MONGO_URL" if os.getenv("MONGO_URL") else "MONGODB_URI"
+database_name = os.getenv("DB_NAME")
+if not database_name:
+    raise RuntimeError("Set DB_NAME to select the MongoDB database.")
+
+try:
+    database_host = urlsplit(mongo_url).hostname or "unknown"
+except ValueError:
+    database_host = "invalid MongoDB URI"
+
+client = AsyncIOMotorClient(mongo_url, serverSelectionTimeoutMS=10000)
+db = client[database_name]
+
+
+async def verify_connection() -> None:
+    logger.info(
+        "MongoDB configuration loaded from %s (host=%s, database=%s)",
+        mongo_env_name,
+        database_host,
+        database_name,
+    )
+    try:
+        await client.admin.command("ping")
+    except Exception:
+        logger.exception(
+            "MongoDB connection failed (env=%s, host=%s, database=%s)",
+            mongo_env_name,
+            database_host,
+            database_name,
+        )
+        raise
+
+    logger.info(
+        "MongoDB connection successful (env=%s, host=%s, database=%s)",
+        mongo_env_name,
+        database_host,
+        database_name,
+    )
+
 
 # One entry per collection: every field a route filters, sorts, or dedupes on. Applied by ensure_indexes() at startup.
 INDEXES: dict[str, list[IndexModel]] = {
