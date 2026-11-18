@@ -12,7 +12,7 @@ from lib.security import hash_password
 IST = ZoneInfo("Asia/Kolkata")
 IMG = "https://static.prod-images.emergentagent.com/jobs/a22da722-1531-450f-80dd-4e90a44395d3/images/{h}.jpeg"
 
-OWNER_USERNAME = os.environ.get("HARM_ADMIN_USERNAME", "").strip()
+OWNER_USERNAME = os.environ.get("HARM_ADMIN_USERNAME", "").strip().upper()
 OWNER_PASSWORD = os.environ.get("HARM_ADMIN_PASSWORD", "")
 
 # (slug, name, category, subcategory, brand, price, unit, image-hash, description, stock, best, new)

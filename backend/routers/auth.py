@@ -1,4 +1,5 @@
 """Owner auth: httpOnly-cookie sessions. Owner login button is the only public entry."""
+import re
 import secrets
 from datetime import timedelta
 
@@ -34,7 +35,10 @@ async def require_owner(harm_session: str | None = Cookie(default=None)) -> dict
 
 @router.post("/auth/login", response_model=OwnerInfo)
 async def login(input: LoginRequest, response: Response):
-    user = await db.users.find_one({"username": input.username.strip().upper()})
+    username = input.username.strip()
+    user = await db.users.find_one(
+        {"username": {"$regex": f"^{re.escape(username)}$", "$options": "i"}}
+    )
     if not user or not verify_password(input.password, user.get("password_hash", "")):
         raise HTTPException(status_code=401, detail="Invalid username or password")
     token = secrets.token_urlsafe(32)

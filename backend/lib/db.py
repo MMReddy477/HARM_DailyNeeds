@@ -2,12 +2,16 @@
 
 import logging
 import os
+import uuid
 from pathlib import Path
 from urllib.parse import urlsplit
 
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo import ASCENDING, DESCENDING, IndexModel
+from pymongo.errors import DuplicateKeyError
+
+from lib.security import hash_password
 
 load_dotenv(Path(__file__).parent.parent / ".env")
 
@@ -40,7 +44,7 @@ async def verify_connection() -> None:
     )
     try:
         await client.admin.command("ping")
-    except Exception:
+    except DuplicateKeyError:
         logger.exception(
             "MongoDB connection failed (env=%s, host=%s, database=%s)",
             mongo_env_name,
@@ -55,6 +59,37 @@ async def verify_connection() -> None:
         database_host,
         database_name,
     )
+
+
+async def ensure_initial_owner() -> None:
+    username = os.getenv("HARM_ADMIN_USERNAME", "").strip().upper()
+    password = os.getenv("HARM_ADMIN_PASSWORD", "")
+    if not username or not password:
+        logger.warning(
+            "Initial admin was not provisioned: set HARM_ADMIN_USERNAME and HARM_ADMIN_PASSWORD."
+        )
+        return
+
+    await db.users.create_index("username", unique=True, name="username")
+    if await db.users.count_documents({}, limit=1):
+        logger.info("An admin account already exists; startup will not change or replace credentials.")
+        return
+
+    try:
+        await db.users.insert_one(
+            {
+                "id": str(uuid.uuid4()),
+                "username": username,
+                "password_hash": hash_password(password),
+                "role": "owner",
+            }
+        )
+    except Exception:
+        if await db.users.count_documents({}, limit=1):
+            logger.info("Admin account was created by another application instance.")
+            return
+        raise
+    logger.info("Created the first admin account from configured environment variables.")
 
 
 # One entry per collection: every field a route filters, sorts, or dedupes on. Applied by ensure_indexes() at startup.

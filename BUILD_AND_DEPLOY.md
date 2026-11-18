@@ -42,6 +42,10 @@ At startup, the backend accepts `MONGO_URL` or `MONGODB_URI` and logs which vari
 
 If Atlas connectivity fails, verify that the URI uses a MongoDB **database user's** username/password (not Atlas website credentials), URL-encode special characters in the password, and allow the Render service's outbound IP address or addresses in Atlas **Network Access**. Use Render's static outbound IPs when available; avoid leaving Atlas open to all IPs.
 
+On the first startup, if the configured `HARM_ADMIN_USERNAME` does not already exist, the service creates its owner account using `HARM_ADMIN_PASSWORD`. It never uses a built-in default password and never resets an existing account's password at startup. Set both variables in Render before deploying; if an account already exists and its password is unknown, reset it using the backend's trusted seed process.
+
+Uploads use local filesystem storage instead of Emergent object storage. Render mounts a persistent disk at `/var/data`, and `UPLOADS_DIR` points to `/var/data/uploads`; local development defaults to `backend/uploads`. Storage initialization errors are logged without preventing the web service from starting. Existing files in the old Emergent storage are not migrated automatically.
+
 ## Deployment diagnostics
 
 The missing-root-`package.json` error is addressed by the root workspace manifest and lockfile. If a deploy reports that file missing again, verify the Render Root Directory is `.` and that the deployment is using the latest commit on the intended branch. Do not configure a Publish Directory for this Docker web service.
