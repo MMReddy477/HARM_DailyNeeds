@@ -36,7 +36,7 @@ The checked-in `render.yaml` deploys a single Docker web service so the Node fro
 - **Publish Directory:** Not applicable; this is a web service, not a static-site service. FastAPI serves `frontend/dist`.
 - **Health check:** `/api/`.
 
-In the Render service environment, provide `MONGO_URL`, `HARM_ADMIN_USERNAME`, and `HARM_ADMIN_PASSWORD`. The Blueprint sets `DB_NAME=harm_daily_needs` and `APP_TZ=Asia/Kolkata`. Configure a reachable MongoDB instance separately; the repository does not include one.
+In the Render service environment, provide `MONGO_URL`, `HARM_ADMIN_USERNAME`, and `HARM_ADMIN_PASSWORD`. The Blueprint sets `DB_NAME=harm_daily_needs` and `APP_TZ=Asia/Kolkata`. Configure a reachable MongoDB instance separately; the repository does not include one. Local `backend/.env` and Render must use the same MongoDB cluster URI in `MONGO_URL` to share the same database and collections.
 
 At startup, the backend accepts `MONGO_URL` or `MONGODB_URI` and logs which variable it selected, plus the MongoDB host and database name. It runs a MongoDB ping before starting the service; connection failures include a traceback in the Render logs, but never log the connection URI.
 
@@ -45,6 +45,8 @@ If Atlas connectivity fails, verify that the URI uses a MongoDB **database user'
 On the first startup, if the configured `HARM_ADMIN_USERNAME` does not already exist, the service creates its owner account using `HARM_ADMIN_PASSWORD`. It never uses a built-in default password and never resets an existing account's password at startup. Set both variables in Render before deploying; if an account already exists and its password is unknown, reset it using the backend's trusted seed process.
 
 Signed-in owners can change their password under **Admin → Settings → Change Admin Password**. The change requires the current password and a new password of at least 12 characters. If locked out, set the desired `HARM_ADMIN_USERNAME` and `HARM_ADMIN_PASSWORD` in Render, then run `cd /app/backend && python seed.py` from the Render Shell; run it against the same `DB_NAME` that contains the existing store data.
+
+On startup, the app inserts any missing starter catalog products (including dairy and drinks) into the configured database. Existing product prices, stock, and edits are preserved. It does not create sample sales or revenue records; dashboard totals reflect actual transactions.
 
 Uploads use local filesystem storage instead of Emergent object storage. Render mounts a persistent disk at `/var/data`, and `UPLOADS_DIR` points to `/var/data/uploads`; local development defaults to `backend/uploads`. Storage initialization errors are logged without preventing the web service from starting. Existing files in the old Emergent storage are not migrated automatically.
 

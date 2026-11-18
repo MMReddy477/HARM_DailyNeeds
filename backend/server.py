@@ -18,6 +18,7 @@ load_dotenv(ROOT_DIR / '.env')
 # MongoDB connection
 from lib.db import client, db, ensure_indexes, ensure_initial_owner, verify_connection
 from lib.storage import init_storage
+from seed import seed_products
 
 
 # Startup runs before the yield, shutdown after it. Add your own setup/teardown here.
@@ -25,6 +26,8 @@ from lib.storage import init_storage
 async def lifespan(app: FastAPI):
     await verify_connection()
     await ensure_initial_owner()
+    added_products = await seed_products()
+    logger.info("Catalog ready; added %s missing products.", added_products)
     app.state.index_task = asyncio.create_task(ensure_indexes())  # background: a big index build must not block boot
     asyncio.create_task(init_storage())
     yield

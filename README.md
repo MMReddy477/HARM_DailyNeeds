@@ -23,7 +23,7 @@ Create `backend/.env` from the example and set a unique owner username and passw
 Copy-Item backend\env.example backend\.env
 ```
 
-Set `MONGO_URL`, `DB_NAME`, `HARM_ADMIN_USERNAME`, and `HARM_ADMIN_PASSWORD` in `backend/.env`. Keep this file local; it is ignored by Git.
+Set `MONGO_URL`, `DB_NAME=harm_daily_needs`, `HARM_ADMIN_USERNAME`, and `HARM_ADMIN_PASSWORD` in `backend/.env`. To use the same MongoDB data locally and on Render, set the same MongoDB cluster URI in both environments. Keep this file local; it is ignored by Git.
 
 Install backend dependencies and seed the catalog and owner account:
 

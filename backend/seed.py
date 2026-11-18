@@ -143,22 +143,11 @@ def utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
-async def seed() -> None:
-    if not OWNER_USERNAME or not OWNER_PASSWORD:
-        raise RuntimeError("Set HARM_ADMIN_USERNAME and HARM_ADMIN_PASSWORD before seeding.")
-
-    # Owner account (upsert by username)
-    await db.users.update_one(
-        {"username": OWNER_USERNAME},
-        {
-            "$set": {"password_hash": hash_password(OWNER_PASSWORD), "role": "owner"},
-            "$setOnInsert": {"id": str(uuid.uuid4())},
-        },
-        upsert=True,
-    )
-
-    # Products (replace by deterministic id)
+async def seed_products() -> int:
+    """Insert missing catalog products without changing existing inventory or prices."""
+    await db.products.create_index("id", unique=True, name="id")
     now = utcnow()
+    inserted = 0
     for i, (slug, name, category, sub, brand, price, unit, img, desc, stock, best, new) in enumerate(PRODUCTS):
         existing = await db.products.find_one({"id": slug_id(slug)})
         if existing:
@@ -191,6 +180,26 @@ async def seed() -> None:
             "updated_at": now - timedelta(hours=i * 7),
         }
         await db.products.insert_one(doc)
+        inserted += 1
+    return inserted
+
+
+async def seed() -> None:
+    if not OWNER_USERNAME or not OWNER_PASSWORD:
+        raise RuntimeError("Set HARM_ADMIN_USERNAME and HARM_ADMIN_PASSWORD before seeding.")
+
+    # Owner account (upsert by username)
+    await db.users.update_one(
+        {"username": OWNER_USERNAME},
+        {
+            "$set": {"password_hash": hash_password(OWNER_PASSWORD), "role": "owner"},
+            "$setOnInsert": {"id": str(uuid.uuid4())},
+        },
+        upsert=True,
+    )
+
+    # Products (replace by deterministic id)
+    await seed_products()
 
     if await db.kits.count_documents({}) == 0:
         for sort, kname, crange, kdesc, items in KITS:

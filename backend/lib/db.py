@@ -22,9 +22,7 @@ if not mongo_url:
     raise RuntimeError("Set either MONGO_URL or MONGODB_URI to connect to MongoDB.")
 
 mongo_env_name = "MONGO_URL" if os.getenv("MONGO_URL") else "MONGODB_URI"
-database_name = os.getenv("DB_NAME")
-if not database_name:
-    raise RuntimeError("Set DB_NAME to select the MongoDB database.")
+database_name = os.getenv("DB_NAME", "harm_daily_needs")
 
 try:
     database_host = urlsplit(mongo_url).hostname or "unknown"

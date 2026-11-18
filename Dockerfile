@@ -12,5 +12,5 @@ RUN pip install --no-cache-dir -r backend/requirements.txt
 COPY backend backend
 COPY --from=frontend-build /app/frontend/dist frontend/dist
 
-ENV HOST=0.0.0.0
+ENV HOST=0.0.0.0 DB_NAME=harm_daily_needs
 CMD ["python", "backend/serve_local.py"]
