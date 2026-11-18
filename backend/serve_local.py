@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 from fastapi import HTTPException
 from fastapi.responses import FileResponse
@@ -32,4 +33,8 @@ async def serve_frontend(path: str):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="127.0.0.1", port=3000)
+    uvicorn.run(
+        app,
+        host=os.environ.get("HOST", "0.0.0.0"),
+        port=int(os.environ.get("PORT", "3000")),
+    )

@@ -26,9 +26,10 @@ import {
 export * from "lucide-react-upstream";
 
 type IconNode = Parameters<typeof createLucideIcon>[1];
+type BrandIconProps = LucideProps & { color?: string; strokeWidth?: number };
 
 function fromSimpleIcons(name: string, Si: IconType) {
-  const Brand = forwardRef<SVGSVGElement, LucideProps>(function Brand(props, ref) {
+  const Brand = forwardRef<SVGSVGElement, BrandIconProps>(function Brand(props, ref) {
     // Simple Icons marks are filled shapes: lucide's stroke props mean nothing on them.
     const { size = 24, color = "currentColor", strokeWidth, absoluteStrokeWidth, ...rest } = props;
     void strokeWidth;

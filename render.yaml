@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: harm-daily-needs
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.4
+      - key: NODE_VERSION
+        value: 24.22.1
+      - key: DB_NAME
+        value: harm_daily_needs
+      - key: MONGO_URL
+        sync: false
+      - key: HARM_ADMIN_USERNAME
+        sync: false
+      - key: HARM_ADMIN_PASSWORD
+        sync: false
+      - key: APP_TZ
+        value: Asia/Kolkata
