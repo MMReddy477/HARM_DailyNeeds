@@ -4,15 +4,21 @@ import secrets
 from datetime import timedelta
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
+from pydantic import BaseModel, Field
 
 from lib.db import db
-from lib.security import verify_password
+from lib.security import hash_password, verify_password
 from models.ops import LoginRequest, OwnerInfo, utcnow
 
 router = APIRouter(tags=["auth"])
 
 COOKIE_NAME = "harm_session"
 SESSION_DAYS = 7
+
+
+class PasswordChange(BaseModel):
+    current_password: str = Field(min_length=1, max_length=128)
+    new_password: str = Field(min_length=12, max_length=128)
 
 
 async def require_owner(harm_session: str | None = Cookie(default=None)) -> dict:
@@ -70,3 +76,23 @@ async def logout(response: Response, harm_session: str | None = Cookie(default=N
 @router.get("/auth/me", response_model=OwnerInfo)
 async def me(owner: dict = Depends(require_owner)):
     return OwnerInfo(username=owner["username"], role=owner["role"])
+
+
+@router.post("/auth/password")
+async def change_password(
+    input: PasswordChange,
+    owner: dict = Depends(require_owner),
+    harm_session: str | None = Cookie(default=None),
+) -> dict[str, str]:
+    user = await db.users.find_one({"username": owner["username"]})
+    if not user or not verify_password(input.current_password, user.get("password_hash", "")):
+        raise HTTPException(status_code=401, detail="Current password is incorrect")
+
+    await db.users.update_one(
+        {"username": owner["username"]},
+        {"$set": {"password_hash": hash_password(input.new_password)}},
+    )
+    await db.sessions.delete_many(
+        {"username": owner["username"], "token": {"$ne": harm_session}}
+    )
+    return {"message": "Password updated"}

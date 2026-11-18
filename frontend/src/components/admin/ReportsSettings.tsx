@@ -9,7 +9,7 @@ import { downloadFile, useSettings } from "@/components/admin/PosSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/api";
+import { ApiError, apiDelete, apiGet, apiPost, apiPut } from "@/lib/api";
 import { inr, type ClosingReport, type Review, type StockEmailResult, type StoreSettings } from "@/lib/types";
 
 const COLORS = ["#6D28D9", "#8B5CF6", "#A78BFA", "#F59E0B", "#059669", "#0EA5E9", "#EC4899"];
@@ -82,8 +82,36 @@ export function SettingsSection() {
   const { data } = useSettings();
   const qc = useQueryClient();
   const [form, setForm] = useState<StoreSettings | null>(null);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const f = form ?? data;
   const save = useMutation({ mutationFn: () => apiPut<StoreSettings>("/settings", f), onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin-settings"] }); setForm(null); toast.success("Settings saved"); }, onError: () => toast.error("Check the email address and try again") });
+  const changePassword = useMutation({
+    mutationFn: () => apiPost<{ message: string }>("/auth/password", {
+      current_password: currentPassword,
+      new_password: newPassword,
+    }),
+    onSuccess: () => {
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setPasswordError("");
+      toast.success("Admin password updated");
+    },
+    onError: (error) => {
+      if (error instanceof ApiError && error.status === 401) {
+        setPasswordError("Current password is incorrect");
+        return;
+      }
+      if (error instanceof ApiError && error.status === 422) {
+        setPasswordError("New password must be at least 12 characters");
+        return;
+      }
+      setPasswordError("Could not update the password. Please try again.");
+    },
+  });
   if (!f) return <p className="text-slate-500">Loading…</p>;
   const field = (key: keyof StoreSettings, label: string, type = "text") => (
     <div className="space-y-1.5">
@@ -92,18 +120,58 @@ export function SettingsSection() {
     </div>
   );
   return (
-    <div className="max-w-3xl space-y-5 rounded-2xl border border-slate-200 bg-white p-6" data-testid="admin-settings-section">
-      <div className="grid gap-4 sm:grid-cols-2">
-        {field("business_name", "Business Name")}
-        {field("phone", "Phone Number")}
-        <div className="sm:col-span-2">{field("address", "Business Address")}</div>
-        {field("store_hours", "Store Hours")}
-        {field("tax_percent", "Tax / GST % on bills", "number")}
-        <div className="sm:col-span-2">{field("google_review_link", "Google Review Link")}</div>
-        <div className="sm:col-span-2">{field("report_email", "Report Email (11 PM closing + 7 AM dairy reorder list)", "email")}</div>
+    <div className="max-w-3xl space-y-5" data-testid="admin-settings-section">
+      <div className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6">
+        <h2 className="text-lg font-bold text-[#111827]">Store Settings</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {field("business_name", "Business Name")}
+          {field("phone", "Phone Number")}
+          <div className="sm:col-span-2">{field("address", "Business Address")}</div>
+          {field("store_hours", "Store Hours")}
+          {field("tax_percent", "Tax / GST % on bills", "number")}
+          <div className="sm:col-span-2">{field("google_review_link", "Google Review Link")}</div>
+          <div className="sm:col-span-2">{field("report_email", "Report Email (11 PM closing + 7 AM dairy reorder list)", "email")}</div>
+        </div>
+        <p className="rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">Automatic WhatsApp (Twilio): <b className={f.whatsapp_auto ? "text-emerald-700" : "text-orange-600"}>{f.whatsapp_auto ? "Connected" : "Not connected — one-tap WhatsApp is used"}</b></p>
+        <Button className="h-11 bg-[#6D28D9] px-6 text-base hover:bg-[#5B21B6]" disabled={!form || save.isPending} onClick={() => save.mutate()} data-testid="settings-save-button">Save Settings</Button>
       </div>
-      <p className="rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">Automatic WhatsApp (Twilio): <b className={f.whatsapp_auto ? "text-emerald-700" : "text-orange-600"}>{f.whatsapp_auto ? "Connected" : "Not connected — one-tap WhatsApp is used"}</b></p>
-      <Button className="h-11 bg-[#6D28D9] px-6 text-base hover:bg-[#5B21B6]" disabled={!form || save.isPending} onClick={() => save.mutate()} data-testid="settings-save-button">Save Settings</Button>
+
+      <form
+        className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6"
+        data-testid="admin-password-section"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setPasswordError("");
+          if (newPassword !== confirmPassword) {
+            setPasswordError("New passwords do not match");
+            return;
+          }
+          changePassword.mutate();
+        }}
+      >
+        <div>
+          <h2 className="text-lg font-bold text-[#111827]">Change Admin Password</h2>
+          <p className="mt-1 text-sm text-slate-600">Choose a new password with at least 12 characters.</p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label htmlFor="admin-current-password">Current Password</Label>
+            <Input id="admin-current-password" type="password" autoComplete="current-password" required maxLength={128} value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} data-testid="admin-current-password-input" />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="admin-new-password">New Password</Label>
+            <Input id="admin-new-password" type="password" autoComplete="new-password" required minLength={12} maxLength={128} value={newPassword} onChange={(event) => setNewPassword(event.target.value)} data-testid="admin-new-password-input" />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="admin-confirm-password">Confirm New Password</Label>
+            <Input id="admin-confirm-password" type="password" autoComplete="new-password" required minLength={12} maxLength={128} value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} data-testid="admin-confirm-password-input" />
+          </div>
+        </div>
+        {passwordError ? <p className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700" role="alert" data-testid="admin-password-error">{passwordError}</p> : null}
+        <Button type="submit" className="h-11 bg-[#6D28D9] px-6 text-base hover:bg-[#5B21B6]" disabled={!currentPassword || newPassword.length < 12 || !confirmPassword || changePassword.isPending} data-testid="admin-change-password-button">
+          {changePassword.isPending ? "Updating…" : "Update Password"}
+        </Button>
+      </form>
     </div>
   );
 }

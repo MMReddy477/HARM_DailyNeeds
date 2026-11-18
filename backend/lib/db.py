@@ -44,7 +44,7 @@ async def verify_connection() -> None:
     )
     try:
         await client.admin.command("ping")
-    except DuplicateKeyError:
+    except Exception:
         logger.exception(
             "MongoDB connection failed (env=%s, host=%s, database=%s)",
             mongo_env_name,
@@ -84,7 +84,7 @@ async def ensure_initial_owner() -> None:
                 "role": "owner",
             }
         )
-    except Exception:
+    except DuplicateKeyError:
         if await db.users.count_documents({}, limit=1):
             logger.info("Admin account was created by another application instance.")
             return
