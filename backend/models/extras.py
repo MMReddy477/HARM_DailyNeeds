@@ -187,6 +187,7 @@ class Overview(BaseModel):
     daily: list[dict]  # [{date, revenue, profit}] last 30 days
     monthly: list[dict]  # [{month, revenue, profit}] last 6 months
     categories: list[dict]  # [{category, revenue, qty}]
+    gift_categories: list[dict] = Field(default_factory=list)  # [{category, revenue, profit, qty}] current month
     top_products: list[dict]  # [{name, qty, revenue}]
     notices: list[Notice]
     bills_today: int = 0

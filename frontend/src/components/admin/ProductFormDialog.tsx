@@ -40,7 +40,7 @@ function toDraft(p: Product | null): Draft {
   return rest;
 }
 
-const CATEGORY_NAMES = Object.values(CATEGORIES).map((c) => c.name);
+const CATEGORY_OPTIONS = Object.values(CATEGORIES).map((c) => ({ value: c.name, label: c.displayName ?? c.name }));
 
 interface Props {
   open: boolean;
@@ -123,8 +123,8 @@ export default function ProductFormDialog({ open, onOpenChange, product }: Props
                 <SelectValue>{(v: string) => v}</SelectValue>
               </SelectTrigger>
               <SelectContent>
-                {CATEGORY_NAMES.map((c) => (
-                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                {CATEGORY_OPTIONS.map((c) => (
+                  <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

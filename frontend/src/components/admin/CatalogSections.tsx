@@ -76,7 +76,7 @@ export function ProductsSection({ categories, title, match }: { categories?: str
             <SelectTrigger className="h-10 bg-white" data-testid="products-category-filter"><SelectValue>{(v: string) => (v === "all" ? "All Categories" : v)}</SelectValue></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-              {Object.values(CATEGORIES).map((c) => <SelectItem key={c.slug} value={c.name}>{c.name}</SelectItem>)}
+              {Object.values(CATEGORIES).map((c) => <SelectItem key={c.slug} value={c.name}>{c.displayName ?? c.name}</SelectItem>)}
             </SelectContent>
           </Select>
         ) : null}
@@ -101,7 +101,7 @@ export function ProductsSection({ categories, title, match }: { categories?: str
           <Button size="sm" variant="outline" onClick={() => bulk.mutate({ stock_delta: 10 })} data-testid="bulk-stock-add">+10 Stock</Button>
           <Select value="" onValueChange={(v) => v && bulk.mutate({ category: v })}>
             <SelectTrigger size="sm" className="bg-white" data-testid="bulk-category-select"><SelectValue>{() => "Move to category…"}</SelectValue></SelectTrigger>
-            <SelectContent>{Object.values(CATEGORIES).map((c) => <SelectItem key={c.slug} value={c.name}>{c.name}</SelectItem>)}</SelectContent>
+            <SelectContent>{Object.values(CATEGORIES).map((c) => <SelectItem key={c.slug} value={c.name}>{c.displayName ?? c.name}</SelectItem>)}</SelectContent>
           </Select>
           <Button size="sm" variant="destructive" onClick={() => window.confirm(`Delete ${selected.length} products?`) && bulk.mutate({ delete: true })} data-testid="bulk-delete">Delete</Button>
         </div>
@@ -178,7 +178,7 @@ export function CategoriesSection({ onOpen }: { onOpen: (category: string) => vo
           <button key={c.slug} type="button" onClick={() => onOpen(c.name)} data-testid={`category-card-${c.slug}`} className="overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-lg">
             <img src={c.image} alt="" loading="lazy" className="h-28 w-full object-cover" />
             <div className="p-4">
-              <p className="text-lg font-bold text-[#111827]">{c.name}</p>
+              <p className="text-lg font-bold text-[#111827]">{c.displayName ?? c.name}</p>
               <p className="mt-1 text-sm text-slate-600">{items.length} products · {inr(value)} stock value</p>
               {low ? <p className="mt-1 text-sm font-semibold text-orange-600">{low} need restocking</p> : <p className="mt-1 text-sm font-semibold text-emerald-600">All well stocked</p>}
               <p className="mt-2 text-xs text-slate-400">{c.subs.join(" · ")}</p>

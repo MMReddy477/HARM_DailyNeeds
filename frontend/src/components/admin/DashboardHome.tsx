@@ -37,7 +37,7 @@ export default function DashboardHome({ onNavigate }: { onNavigate?: (section: s
   const { data: products } = useQuery({ queryKey: ["products", "admin-all"], queryFn: () => apiGet<Product[]>("/products?limit=200") });
   const lows = (products ?? []).filter((p) => stockState(p) !== "ok").sort((a, b) => a.stock - b.stock).slice(0, 6);
   const cashTotal = Object.values(o?.payments ?? {}).reduce((s, v) => s + v, 0);
-  const UNIT_ICON: Record<string, string> = { school: "📚", dairy: "🥛", xerox: "🖨️", money: "💸" };
+  const UNIT_ICON: Record<string, string> = { school: "📚", dairy: "🥛", gifts: "🎁", xerox: "🖨️", money: "💸" };
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-2xl bg-gradient-to-r from-[#6D28D9] to-[#4C1D95] px-5 py-3.5 text-white shadow-md" data-testid="dashboard-summary-strip">
@@ -64,7 +64,7 @@ export default function DashboardHome({ onNavigate }: { onNavigate?: (section: s
             <div className="mt-2 flex flex-wrap gap-x-4 text-sm text-slate-600">
               <span>Month <b className="text-[#111827]">{inr(u.month)}</b></span>
               <span>Profit <b className="text-emerald-700">{inr(u.month_profit)}</b></span>
-              {u.id === "school" || u.id === "dairy" ? <span>Sold today <b>{u.sold_today}</b></span> : null}
+              {u.id === "school" || u.id === "dairy" || u.id === "gifts" ? <span>Sold today <b>{u.sold_today}</b></span> : null}
             </div>
           </div>
         ))}

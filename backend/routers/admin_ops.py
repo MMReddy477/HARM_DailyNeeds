@@ -18,7 +18,13 @@ router = APIRouter(tags=["admin-ops"])
 IST = ZoneInfo("Asia/Kolkata")
 SCHOOL_CATS = {"Stationery", "Note Books", "Office Supplies"}
 BEVERAGE_SUBS = {"Soft Drinks", "Water Bottles", "Juices", "Energy Drinks"}
-UNITS = [("school", "School & Office Supplies"), ("dairy", "Dairy & Beverages"), ("xerox", "Xerox & Printing"), ("money", "Money Transfer")]
+UNITS = [
+    ("school", "School & Office Supplies"),
+    ("dairy", "Dairy & Beverages"),
+    ("gifts", "Gift Items"),
+    ("xerox", "Xerox & Printing"),
+    ("money", "Money Transfer"),
+]
 
 
 def _sum(rows: list[dict], key: str) -> float:
@@ -208,11 +214,15 @@ async def overview(owner: dict = Depends(require_owner)):
             return "money"
         p = pmap.get(t.get("product_id", ""), {})
         cat = t.get("category") or p.get("category", "")
+        if cat == "Gift Shop":
+            return "gifts"
         if cat == "Milk & Dairy" or (cat == "Daily Needs" and p.get("subcategory") in BEVERAGE_SUBS):
             return "dairy"
         return "school" if cat in SCHOOL_CATS else "other"
 
     def prod_unit(p: dict) -> str:
+        if p.get("category") == "Gift Shop":
+            return "gifts"
         if p.get("category") == "Milk & Dairy" or (p.get("category") == "Daily Needs" and p.get("subcategory") in BEVERAGE_SUBS):
             return "dairy"
         return "school" if p.get("category") in SCHOOL_CATS else "other"
@@ -226,10 +236,25 @@ async def overview(owner: dict = Depends(require_owner)):
                       "sold_today": int(sum(t["quantity"] for t in td if t["type"] == "sale")),
                       "products": len([p for p in products if prod_unit(p) == uid])})
     snapshot = []
-    for uid, label in (("school", "School & Office Supplies"), ("dairy", "Milk, Dairy & Beverages"), ("other", "Gifts & Daily Needs")):
+    for uid, label in (("school", "School & Office Supplies"), ("dairy", "Milk, Dairy & Beverages"), ("gifts", "Gift Items"), ("other", "Daily Needs")):
         ps = [p for p in products if prod_unit(p) == uid]
         snapshot.append({"label": label, "items": int(sum(max(p.get("stock", 0), 0) for p in ps)),
                          "value": float(sum(float(p.get("cost_price") or 0) * max(p.get("stock", 0), 0) for p in ps))})
+    gift_categories: dict[str, dict] = {}
+    for t in t_month:
+        if t["type"] != "sale":
+            continue
+        p = pmap.get(t.get("product_id", ""), {})
+        if (t.get("category") or p.get("category", "")) != "Gift Shop":
+            continue
+        subcategory = p.get("subcategory") or "Other Gift Items"
+        row = gift_categories.setdefault(
+            subcategory,
+            {"category": subcategory, "revenue": 0.0, "profit": 0.0, "qty": 0},
+        )
+        row["revenue"] += float(t.get("amount", 0) or 0)
+        row["profit"] += float(t.get("amount", 0) or 0) - float(t.get("cost", 0) or 0)
+        row["qty"] += int(t.get("quantity", 0) or 0)
     payments = {"cash": 0.0, "upi": 0.0, "card": 0.0}
     async for b in db.bills.find({"recorded_date": today}):
         payments[b.get("payment_mode", "cash")] = payments.get(b.get("payment_mode", "cash"), 0) + float(b.get("total", 0))
@@ -260,6 +285,7 @@ async def overview(owner: dict = Depends(require_owner)):
         daily=daily,
         monthly=monthly,
         categories=sorted(cats.values(), key=lambda c: -c["revenue"]),
+        gift_categories=sorted(gift_categories.values(), key=lambda c: -c["revenue"])[:8],
         top_products=ranked[:8],
         notices=notices,
         bills_today=bills_today,

@@ -64,6 +64,37 @@ export function ReportsSection() {
           <div className="h-64"><ResponsiveContainer><BarChart data={o?.top_products ?? []} layout="vertical"><XAxis type="number" tick={{ fontSize: 12 }} /><YAxis type="category" dataKey="name" width={150} tick={{ fontSize: 11 }} /><Tooltip formatter={(v: number) => inr(v)} /><Bar dataKey="revenue" fill="#8B5CF6" radius={[0, 6, 6, 0]} /></BarChart></ResponsiveContainer></div>
         </Card>
       </div>
+      <Card title="Gift Category Sales (this month)" testid="chart-gift-categories">
+        {(o?.gift_categories ?? []).length === 0 ? (
+          <p className="py-8 text-center text-sm text-slate-500">No gift item sales recorded this month.</p>
+        ) : (
+          <>
+            <div className="h-64">
+              <ResponsiveContainer>
+                <BarChart data={o?.gift_categories ?? []}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#EDE9FE" />
+                  <XAxis dataKey="category" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 12 }} />
+                  <Tooltip formatter={(v: number) => inr(v)} />
+                  <Legend />
+                  <Bar dataKey="revenue" name="Revenue" fill="#6D28D9" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="profit" name="Profit" fill="#059669" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-4 divide-y divide-slate-100">
+              {(o?.gift_categories ?? []).map((category) => (
+                <div key={category.category} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2 text-sm" data-testid={`gift-sales-${category.category.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
+                  <span className="font-semibold text-slate-700">{category.category}</span>
+                  <span className="text-slate-600">{category.qty} sold</span>
+                  <span className="text-slate-600">Revenue <b className="text-slate-900">{inr(category.revenue)}</b></span>
+                  <span className="text-emerald-700">Profit <b>{inr(category.profit)}</b></span>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </Card>
       <Card title="Nightly Closing Reports (auto at 11:00 PM)" testid="closing-reports-list">
         <div className="space-y-2">
           {(reports ?? []).length === 0 ? <p className="text-slate-500">No reports yet — the first one is generated tonight at 11 PM.</p> : (reports ?? []).map((r) => (

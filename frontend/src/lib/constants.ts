@@ -59,6 +59,7 @@ export function whatsappLink(product?: string): string {
 export interface CategoryMeta {
   slug: string;
   name: string;
+  displayName?: string;
   headline: string;
   blurb: string;
   image: string;
@@ -109,12 +110,16 @@ export const CATEGORIES: Record<string, CategoryMeta> = {
   gifts: {
     slug: "gifts",
     name: "Gift Shop",
-    headline: "Gift Shop",
-    blurb:
-      "Premium pen sets, birthday return gifts, greeting cards and creative art kits — wrapped and ready to make someone's day.",
+    displayName: "Gift Items",
+    headline: "Gift Items by Occasion",
+    blurb: "Thoughtful gifts for birthdays, school celebrations, weddings, new babies, housewarmings, festivals and business occasions.",
     image:
       "https://images.pexels.com/photos/7657387/pexels-photo-7657387.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    subs: ["Gift Sets", "Return Gifts", "Cards & Wraps", "Creative Kits"],
+    subs: [
+      "Birthday Gifts", "School & College Gifts", "Wedding Gifts", "Baby Gifts",
+      "Housewarming Gifts", "Festival Gifts", "Seasonal Gifts", "Corporate Gifts",
+      "Gift Sets", "Return Gifts", "Cards & Wraps", "Creative Kits",
+    ],
   },
   dairy: {
     slug: "dairy",
@@ -183,6 +188,20 @@ export const MEGA_MENUS: MegaGroup[] = [
       { heading: "Invoice Books", sub: "Invoice Books", items: ["Tax Invoice (Duplicate)", "Tax Invoice (Triplicate)", "Money Receipt Books", "Challan Books"], brands: ["Falcon"] },
       { heading: "Office Files", sub: "Office Files", items: ["Box Files", "Lever Arch Files", "Ring Binders", "Display Files", "Document Envelopes"], brands: ["Solo", "Deli"] },
       { heading: "Calculators", sub: "Calculators", items: ["Basic Desktop Calculators", "Scientific Calculators", "Printing Calculators", "Desk Organizers"], brands: ["Casio", "Citizen"] },
+    ],
+  },
+  {
+    label: "Gift Items",
+    slug: "gifts",
+    columns: [
+      { heading: "Birthday Gifts", sub: "Birthday Gifts", items: ["Greeting Cards", "Coffee Mugs", "Photo Frames", "Chocolate Gift Packs", "Teddy Bears", "Keychains"], brands: [] },
+      { heading: "School & College Gifts", sub: "School & College Gifts", items: ["Premium Pen Sets", "Art Kits", "Study Kits", "Motivational Diaries", "Geometry Gift Kits"], brands: [] },
+      { heading: "Wedding Gifts", sub: "Wedding Gifts", items: ["Decorative Clocks", "Couple Photo Frames", "Gift Hampers", "Dry Fruit Boxes"], brands: [] },
+      { heading: "Baby Gifts", sub: "Baby Gifts", items: ["Soft Toys", "Baby Gift Sets", "Baby Photo Frames"], brands: [] },
+      { heading: "Housewarming Gifts", sub: "Housewarming Gifts", items: ["Wall Clocks", "Decorative Plants", "LED Lamps", "Flower Pots"], brands: [] },
+      { heading: "Festival Gifts", sub: "Festival Gifts", items: ["Dry Fruit Hampers", "Chocolate Hampers", "Decorative Gift Packs", "Candles"], brands: [] },
+      { heading: "Seasonal Gifts", sub: "Seasonal Gifts", items: ["Santa Toys", "Small Gift Packs", "Decorative Lights", "Mugs", "Valentine Gifts"], brands: [] },
+      { heading: "Corporate Gifts", sub: "Corporate Gifts", items: ["Executive Pen Sets", "Diaries", "Desk Organizers", "Office Gift Kits"], brands: [] },
     ],
   },
 ];

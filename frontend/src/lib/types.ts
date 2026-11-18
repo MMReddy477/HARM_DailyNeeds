@@ -168,6 +168,7 @@ export interface Overview {
   daily: { date: string; revenue: number; profit: number }[];
   monthly: { month: string; revenue: number; profit: number }[];
   categories: { category: string; revenue: number; qty: number }[];
+  gift_categories: { category: string; revenue: number; profit: number; qty: number }[];
   top_products: { name: string; qty: number; revenue: number }[];
   notices: Notice[];
   bills_today: number;

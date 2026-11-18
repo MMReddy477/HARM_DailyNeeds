@@ -11,8 +11,21 @@ import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CATEGORIES, whatsappLink } from "@/lib/constants";
+import { GIFT_GUIDE_PRODUCTS } from "@/lib/home-product-fallbacks";
 import type { Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
+
+const GIFT_UNIVERSAL_SUBCATEGORIES = ["Gift Sets", "Return Gifts", "Cards & Wraps", "Creative Kits"];
+const GIFT_OCCASION_SUBCATEGORIES: Record<string, string> = {
+  "Birthday Gifts": "Birthday Gifts",
+  "School & College Gifts": "School & College Gifts",
+  "Wedding Gifts": "Wedding Gifts",
+  "Baby Gifts": "Baby Gifts",
+  "Housewarming Gifts": "Housewarming Gifts",
+  "Festival Gifts": "Festival Gifts",
+  "Seasonal Gifts": "Seasonal Gifts",
+  "Corporate Gifts": "Corporate Gifts",
+};
 
 export default function CategoryPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -22,7 +35,7 @@ export default function CategoryPage() {
   const [q, setQ] = useState("");
   const [brand, setBrand] = useState("all");
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["products", "category", meta?.name],
     queryFn: () => apiGet<Product[]>(`/products?category=${encodeURIComponent(meta?.name ?? "")}&limit=200`),
     enabled: Boolean(meta),
@@ -39,10 +52,20 @@ export default function CategoryPage() {
     );
   }
 
-  const products = data ?? [];
+  const liveProducts = data ?? [];
+  const giftProductsByName = new Map(
+    GIFT_GUIDE_PRODUCTS.map((product) => [product.name.toLowerCase(), product])
+  );
+  liveProducts.forEach((product) => giftProductsByName.set(product.name.toLowerCase(), product));
+  const products = meta.slug === "gifts" ? Array.from(giftProductsByName.values()) : liveProducts;
+  const liveProductNames = new Set(liveProducts.map((product) => product.name.toLowerCase()));
   const brands = Array.from(new Set(products.map((p) => p.brand).filter(Boolean))).sort();
   const filtered = products.filter((p) => {
-    if (sub && p.subcategory !== sub) return false;
+    const occasionSubcategory = GIFT_OCCASION_SUBCATEGORIES[sub];
+    const matchesGiftOccasion = occasionSubcategory
+      ? p.subcategory === occasionSubcategory || GIFT_UNIVERSAL_SUBCATEGORIES.includes(p.subcategory)
+      : p.subcategory === sub;
+    if (sub && !matchesGiftOccasion) return false;
     if (brand !== "all" && p.brand !== brand) return false;
     if (q && !`${p.name} ${p.brand} ${p.subcategory}`.toLowerCase().includes(q.toLowerCase())) return false;
     return true;
@@ -128,6 +151,19 @@ export default function CategoryPage() {
         </div>
       </section>
 
+      {meta.slug === "gifts" ? (
+        <section className="mx-auto mt-5 flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4" data-testid="gift-guide-notice">
+          <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+            Gift ideas with indicative prices. Stock, designs and final prices need store confirmation.
+          </p>
+          {isError ? (
+            <button type="button" onClick={() => void refetch()} className="text-sm font-bold text-purple-700 underline underline-offset-2" data-testid="gift-catalog-retry">
+              Retry live catalog
+            </button>
+          ) : null}
+        </section>
+      ) : null}
+
       {/* Grid */}
       <section className="mx-auto max-w-7xl px-4 py-10">
         {isLoading ? (
@@ -156,7 +192,11 @@ export default function CategoryPage() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {filtered.map((p) => (
-              <ProductCard key={p.id} product={p} />
+              <ProductCard
+                key={p.id}
+                product={p}
+                availabilityVerified={meta.slug !== "gifts" || liveProductNames.has(p.name.toLowerCase())}
+              />
             ))}
           </div>
         )}

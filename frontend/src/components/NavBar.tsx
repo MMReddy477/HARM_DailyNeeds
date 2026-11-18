@@ -1,12 +1,93 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ChevronDown, Lock, Menu, Phone } from "lucide-react";
+import {
+  Baby,
+  BookOpen,
+  BriefcaseBusiness,
+  Cake,
+  ChevronDown,
+  Gift,
+  GraduationCap,
+  House,
+  Lock,
+  MapPin,
+  Menu,
+  Milk,
+  NotebookPen,
+  PartyPopper,
+  Phone,
+  ShoppingBasket,
+  Sparkles,
+  Store,
+} from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { CATEGORIES, MEGA_MENUS, STORE, type MegaGroup } from "@/lib/constants";import { cn } from "@/lib/utils";
+import { MEGA_MENUS, STORE, type MegaGroup } from "@/lib/constants";
+import { cn } from "@/lib/utils";
+
+const IMAGE_BASE =
+  "https://static.prod-images.emergentagent.com/jobs/a22da722-1531-450f-80dd-4e90a44395d3/images";
+const GIFT_IMAGES = [
+  "c7e98b234265f0cdb5d6f51ee2a3f78725bf0562662ff0c8d42be152373c79fa",
+  "45de0954baa8528aa8d277af9273b11e9251812bb785a8263a67b2dc09dce7fd",
+  "54f67b8289f419b87149dee98b3f041bc6a84f904a9038c0ed6f79b15a50a73e",
+  "2571a4000bd4f4e9877b7d64888631339aa64c6df38dbc30fcc68da1a29e5e73",
+];
+const GIFT_CATEGORY_ICONS = [Cake, GraduationCap, Gift, Baby, House, Sparkles, PartyPopper, BriefcaseBusiness];
+const NAV_ICONS = {
+  stationery: Store,
+  notebooks: NotebookPen,
+  "office-supplies": BriefcaseBusiness,
+  gifts: Gift,
+  "/school-kits": BookOpen,
+  "/dairy-drinks": Milk,
+  "/c/daily-needs": ShoppingBasket,
+  "/location": MapPin,
+};
 
 function MegaPanel({ group }: { group: MegaGroup }) {
+  if (group.slug === "gifts") {
+    return (
+      <div className="absolute inset-x-0 top-full hidden border-b border-purple-100 bg-white/98 shadow-xl backdrop-blur-xl lg:block" data-testid="mega-menu-gifts">
+        <div className="mx-auto max-w-7xl px-4 py-6">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-600">Thoughtful picks for every occasion</p>
+              <h2 className="mt-1 font-heading text-lg font-extrabold text-purple-950">Shop Gift Items</h2>
+            </div>
+            <Link to="/c/gifts" className="text-sm font-bold text-purple-700 hover:text-amber-600" data-testid="gift-menu-view-all">View all gifts →</Link>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {group.columns.map((col, index) => {
+              const Icon = GIFT_CATEGORY_ICONS[index];
+              return (
+                <div key={col.heading} className="rounded-xl border border-purple-100 bg-white p-3 transition-colors hover:border-amber-300" data-testid={`gift-mega-category-${index}`}>
+                  <Link to={`/c/gifts?sub=${encodeURIComponent(col.sub)}`} className="flex items-center gap-2 font-heading text-sm font-extrabold text-purple-800 transition-colors hover:text-amber-600">
+                    <Icon className="size-[22px] shrink-0 fill-purple-100 stroke-current" strokeWidth={2} aria-hidden="true" />
+                    {col.heading}
+                  </Link>
+                  <div className="mt-2 flex gap-1.5">
+                    {[0, 1, 2].map((imageOffset) => {
+                      const image = GIFT_IMAGES[(index + imageOffset) % GIFT_IMAGES.length];
+                      return <img key={imageOffset} src={`${IMAGE_BASE}/${image}.jpeg`} alt="" loading="lazy" className="size-10 rounded-lg border border-purple-100 bg-purple-50 object-cover" />;
+                    })}
+                  </div>
+                  <ul className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1">
+                    {col.items.map((item) => (
+                      <li key={item}>
+                        <Link to={`/c/gifts?sub=${encodeURIComponent(col.sub)}`} className="text-[11px] leading-4 text-slate-600 transition-colors hover:text-purple-700">{item}</Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="absolute inset-x-0 top-full hidden border-b border-purple-100 bg-white/98 shadow-xl backdrop-blur-xl lg:block" data-testid={`mega-menu-${group.slug}`}>
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-7 lg:grid-cols-3 xl:grid-cols-6">
@@ -56,7 +137,6 @@ export default function NavBar() {
   }, [location.pathname, location.search]);
 
   const plainLinks = [
-    { to: "/print-order", label: "Print Online" },
     { to: "/school-kits", label: "School Kits" },
     { to: "/dairy-drinks", label: "Dairy & Drinks" },
     { to: "/c/daily-needs", label: "Daily Needs" },
@@ -83,17 +163,24 @@ export default function NavBar() {
           </span>
         </Link>
 
-        <nav className="ml-auto hidden items-center gap-0.5 lg:flex">
+        <nav className="ml-auto hidden items-center gap-0.5 xl:flex">
+          <Link to="/" data-testid="nav-link-home" className="flex items-center gap-1 whitespace-nowrap rounded-lg px-1.5 py-2 text-xs font-semibold text-slate-700 transition-colors hover:text-purple-700">
+            <House className="size-4 text-purple-700" aria-hidden="true" /> Home
+          </Link>
           {MEGA_MENUS.map((group) => (
             <div key={group.slug} className="relative" onMouseEnter={() => setOpenGroup(group.slug)}>
               <Link
                 to={`/c/${group.slug}`}
                 data-testid={`nav-mega-${group.slug}`}
                 className={cn(
-                  "flex items-center gap-1 whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-semibold transition-colors",
+                  "flex items-center gap-1 whitespace-nowrap rounded-lg px-1.5 py-2 text-xs font-semibold transition-colors",
                   openGroup === group.slug ? "bg-purple-50 text-purple-800" : "text-slate-700 hover:text-purple-700"
                 )}
               >
+                {(() => {
+                  const Icon = NAV_ICONS[group.slug as keyof typeof NAV_ICONS];
+                  return <Icon className={cn("size-4 transition-colors", openGroup === group.slug ? "text-amber-500" : "text-purple-700")} aria-hidden="true" />;
+                })()}
                 {group.label}
                 <ChevronDown className={cn("size-3.5 transition-transform duration-200", openGroup === group.slug && "rotate-180")} />
               </Link>
@@ -104,14 +191,18 @@ export default function NavBar() {
               key={l.to}
               to={l.to}
               data-testid={`nav-link-${l.to.replace(/\//g, "").replace(/-/g, "-") || "home"}`}
-              className="whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-semibold text-slate-700 transition-colors hover:text-purple-700"
+              className="flex items-center gap-1 whitespace-nowrap rounded-lg px-1.5 py-2 text-xs font-semibold text-slate-700 transition-colors hover:text-purple-700"
             >
+              {(() => {
+                const Icon = NAV_ICONS[l.to as keyof typeof NAV_ICONS];
+                return <Icon className="size-4 text-purple-700 transition-colors group-hover:text-amber-500" aria-hidden="true" />;
+              })()}
               {l.label}
             </Link>
           ))}
         </nav>
 
-        <div className="ml-auto flex items-center gap-2 lg:ml-2">
+        <div className="ml-auto flex items-center gap-2 xl:ml-2">
           <a
             href={STORE.phoneTel}
             data-testid="nav-call-button"
@@ -134,7 +225,7 @@ export default function NavBar() {
             onClick={() => setMobileOpen(true)}
             data-testid="nav-mobile-menu-button"
             aria-label="Open menu"
-            className={cn(buttonVariants({ variant: "outline", size: "icon-sm" }), "lg:hidden")}
+            className={cn(buttonVariants({ variant: "outline", size: "icon-sm" }), "xl:hidden")}
           >
             <Menu className="size-4" />
           </button>
@@ -149,14 +240,17 @@ export default function NavBar() {
             <SheetTitle className="font-heading text-purple-950">H.A.R.M DAILY NEEDS</SheetTitle>
           </SheetHeader>
           <div className="space-y-5 px-4 pb-8">
+            <Link to="/" data-testid="mobile-nav-link-home" className="flex items-center gap-2 rounded-md bg-purple-50 px-2 py-2 text-sm font-semibold text-purple-800">
+              <House className="size-4 text-purple-700" aria-hidden="true" /> Home
+            </Link>
             {MEGA_MENUS.map((group) => (
               <div key={group.slug}>
-                <p className="font-heading text-xs font-bold uppercase tracking-wider text-purple-600">{group.label}</p>
+                <Link to={`/c/${group.slug}`} className="font-heading text-xs font-bold uppercase tracking-wider text-purple-600">{group.label}</Link>
                 <div className="mt-2 grid grid-cols-2 gap-1.5">
                   <Link to={`/c/${group.slug}`} data-testid={`mobile-nav-${group.slug}`} className="rounded-md bg-purple-50 px-2 py-1.5 text-[13px] font-semibold text-purple-800">
                     View All
                   </Link>
-                  {group.columns.slice(0, 4).map((col) => (
+                  {group.columns.slice(0, group.slug === "gifts" ? 8 : 4).map((col) => (
                     <Link
                       key={col.sub}
                       to={`/c/${group.slug}?sub=${encodeURIComponent(col.sub)}`}
