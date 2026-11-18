@@ -7,8 +7,11 @@ import { categorySlug, PLACEHOLDER_IMG, whatsappLink } from "@/lib/constants";
 import type { Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product, availabilityVerified = true }: { product: Product; availabilityVerified?: boolean }) {
   const inStock = product.available && product.stock > 0;
+  const availabilityLabel = availabilityVerified
+    ? inStock ? "Available In Store" : "Out of Stock"
+    : "Confirm availability";
   return (
     <div
       data-testid={`product-card-${product.id}`}
@@ -55,10 +58,10 @@ export default function ProductCard({ product }: { product: Product }) {
             data-testid={`product-stock-badge-${product.id}`}
             className={cn(
               "inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide",
-              inStock ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"
+              !availabilityVerified ? "bg-amber-50 text-amber-800" : inStock ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"
             )}
           >
-            {inStock ? "Available In Store" : "Out of Stock"}
+            {availabilityLabel}
           </span>
         </div>
 

@@ -131,3 +131,39 @@
     @apply font-sans;
     }
 }
+
+  @keyframes brand-scroll-left-to-right {
+    from {
+      transform: translateX(-50%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  .brand-marquee {
+    overflow-x: auto;
+    scrollbar-width: none;
+    touch-action: pan-x;
+  }
+
+  .brand-marquee::-webkit-scrollbar {
+    display: none;
+  }
+
+  .brand-track {
+    display: flex;
+    width: max-content;
+    animation: brand-scroll-left-to-right 36s linear infinite;
+  }
+
+  .brand-marquee:hover .brand-track,
+  .brand-marquee:focus-within .brand-track {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brand-track {
+      animation: none;
+    }
+  }

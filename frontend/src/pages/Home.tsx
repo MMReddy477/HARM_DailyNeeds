@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, BadgeCheck, Clock, MessageCircle, Milk, Phone, Star } from "lucide-react";
+import { ArrowRight, BadgeCheck, BookOpen, Clock, MessageCircle, Milk, Phone, Star } from "lucide-react";
 
 import ProductCard from "@/components/ProductCard";
 import QuickContact from "@/components/QuickContact";
@@ -12,15 +12,18 @@ import AiAssistant from "@/components/AiAssistant";
 import FestivalBanners from "@/components/FestivalBanners";
 import { apiGet } from "@/lib/api";
 import { BRANDS, HERO_IMAGES, SERVICES, STORE, whatsappLink } from "@/lib/constants";
+import { HOME_PRODUCT_FALLBACKS } from "@/lib/home-product-fallbacks";
 import type { Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 function ProductRail({ title, eyebrow, flag }: { title: string; eyebrow: string; flag: "best" | "new" }) {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["products", flag],
     queryFn: () => apiGet<Product[]>(`/products?flag=${flag}&limit=200`),
+    retry: 1,
   });
-  const products = [...(data ?? [])]
+  const usingFallback = isError && !data?.length;
+  const products = [...(data ?? (usingFallback ? HOME_PRODUCT_FALLBACKS[flag] : []))]
     .sort((a, b) => {
       const priority = (product: Product) => {
         if (flag === "best" && product.category === "Milk & Dairy" && product.subcategory === "Buttermilk") return 0;
@@ -29,8 +32,7 @@ function ProductRail({ title, eyebrow, flag }: { title: string; eyebrow: string;
         return 2;
       };
       return priority(a) - priority(b);
-    })
-    .slice(0, 8);
+    });
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-12">
@@ -43,17 +45,29 @@ function ProductRail({ title, eyebrow, flag }: { title: string; eyebrow: string;
           Browse Catalog <ArrowRight className="size-4" />
         </Link>
       </div>
+      {usingFallback ? (
+        <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950" role="status" data-testid={`product-rail-error-${flag}`}>
+          Live catalog connection failed. Showing guide prices only; stock and current prices need confirmation.
+          <button type="button" className="ml-2 font-bold underline underline-offset-2" onClick={() => void refetch()}>Retry live catalog</button>
+        </p>
+      ) : null}
       <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {isLoading
-          ? [0, 1, 2, 3].map((i) => <div key={i} className="aspect-[3/4] animate-pulse rounded-2xl border border-purple-100 bg-purple-50/50" />)
-          : products.map((p) => <ProductCard key={p.id} product={p} />)}
+        {isLoading ? (
+          [0, 1, 2, 3].map((i) => <div key={i} className="aspect-[3/4] animate-pulse rounded-2xl border border-purple-100 bg-purple-50/50" />)
+        ) : products.length > 0 ? (
+          products.map((p) => <ProductCard key={p.id} product={p} availabilityVerified={!usingFallback} />)
+        ) : (
+          <p className="rounded-xl border border-purple-100 bg-purple-50/70 p-4 text-sm text-slate-600 sm:col-span-2 lg:col-span-4" data-testid={`product-rail-empty-${flag}`}>
+            No featured products are available yet. Browse the catalog to see current stock.
+          </p>
+        )}
       </div>
     </section>
   );
 }
 
 function DairyDrinksRail() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["products", "dairy-drinks"],
     queryFn: () => apiGet<Product[]>("/products/dairy-drinks"),
   });
@@ -75,7 +89,7 @@ function DairyDrinksRail() {
   const dairyDrinks = [
     ...featuredProducts,
     ...(data ?? []).filter((product) => !featuredProducts.some((featured) => featured.id === product.id)),
-  ].slice(0, 8);
+  ];
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-sky-50/70 via-white to-white" data-testid="home-dairy-drinks-section">
       <div aria-hidden className="pointer-events-none absolute -right-24 top-6 size-72 rounded-full bg-sky-200/40 blur-3xl" />
@@ -87,9 +101,20 @@ function DairyDrinksRail() {
           </Link>
         </div>
         <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {isLoading
-            ? [0, 1, 2, 3].map((i) => <div key={i} className="aspect-[3/4] animate-pulse rounded-2xl border border-sky-100 bg-sky-50/50" />)
-            : dairyDrinks.map((p) => <ProductCard key={p.id} product={p} />)}
+          {isLoading ? (
+            [0, 1, 2, 3].map((i) => <div key={i} className="aspect-[3/4] animate-pulse rounded-2xl border border-sky-100 bg-sky-50/50" />)
+          ) : isError ? (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950 sm:col-span-2 lg:col-span-4" role="alert" data-testid="dairy-drinks-error">
+              Dairy and beverage products could not load right now. Check the connection and try again.
+              <button type="button" className="ml-2 font-bold underline underline-offset-2" onClick={() => void refetch()}>Retry</button>
+            </div>
+          ) : dairyDrinks.length > 0 ? (
+            dairyDrinks.map((p) => <ProductCard key={p.id} product={p} />)
+          ) : (
+            <p className="rounded-xl border border-sky-100 bg-sky-50/70 p-4 text-sm text-slate-600 sm:col-span-2 lg:col-span-4" data-testid="dairy-drinks-empty">
+              Dairy and beverage products are being updated. Please check back soon.
+            </p>
+          )}
         </div>
         <Link to="/milk-subscription" data-testid="home-milk-subscription-cta" className="mt-8 flex flex-wrap items-center gap-3 rounded-2xl border border-sky-200 bg-white/80 p-4 shadow-sm backdrop-blur transition-[border-color,box-shadow] hover:border-purple-300 hover:shadow-md">
           <span className="flex size-10 items-center justify-center rounded-xl bg-sky-100 text-sky-700"><Milk className="size-5" /></span>
@@ -187,16 +212,45 @@ export default function Home() {
           <p className="text-center text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
             India&apos;s trusted brands always in stock
           </p>
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-2.5">
-            {BRANDS.map((brand) => (
-              <span
-                key={brand}
-                className="rounded-full border border-purple-100 bg-purple-50 px-4 py-1.5 font-heading text-sm font-bold text-purple-900"
-                data-testid={`brand-chip-${brand.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
-              >
-                {brand}
-              </span>
-            ))}
+          <div
+            className="brand-marquee mt-4"
+            role="region"
+            aria-label="Trusted stationery brands"
+            data-testid="brand-marquee"
+          >
+            <div className="brand-track">
+              {[0, 1].map((copy) => (
+                <div
+                  key={copy}
+                  className="flex shrink-0 items-center gap-5 px-2"
+                  aria-hidden={copy === 1}
+                >
+                  {BRANDS.map(({ name, logoDomain }) => (
+                    <span
+                      key={name}
+                      className="flex h-16 min-w-36 items-center gap-3 rounded-xl border border-purple-100 bg-white px-4 shadow-sm"
+                      data-testid={`brand-logo-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+                    >
+                      <img
+                        src={`https://www.google.com/s2/favicons?domain_url=https%3A%2F%2F${logoDomain}&sz=128`}
+                        alt={`${name} logo`}
+                        width="40"
+                        height="40"
+                        loading="lazy"
+                        decoding="async"
+                        className="size-10 shrink-0 object-contain"
+                        onError={(event) => {
+                          event.currentTarget.hidden = true;
+                        }}
+                      />
+                      <span aria-hidden="true" className="whitespace-nowrap font-heading text-sm font-extrabold text-purple-950">
+                        {name}
+                      </span>
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -245,6 +299,28 @@ export default function Home() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 pt-12" data-testid="home-school-kits-promo">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#3B0764] via-purple-900 to-purple-800 px-6 py-8 shadow-lg sm:px-10 sm:py-10">
+          <div aria-hidden className="pointer-events-none absolute -right-10 -top-16 size-56 rounded-full bg-amber-300/15 blur-2xl" />
+          <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-300">Back to School</p>
+              <h2 className="mt-2 font-heading text-2xl font-extrabold text-white sm:text-3xl">Ready-Made School Kits</h2>
+              <p className="mt-2 text-sm leading-relaxed text-purple-100 sm:text-base">
+                Pick your class, order on WhatsApp, and collect a packed kit — no list-checking, no running around.
+              </p>
+            </div>
+            <Link
+              to="/school-kits"
+              data-testid="home-school-kits-cta"
+              className={cn(buttonVariants({ size: "lg" }), "shrink-0 gap-2 bg-amber-300 text-purple-950 hover:bg-amber-200")}
+            >
+              <BookOpen className="size-4" /> Explore School Kits <ArrowRight className="size-4" />
+            </Link>
+          </div>
         </div>
       </section>
 

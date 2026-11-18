@@ -247,16 +247,16 @@ export const PRINTER_PHOTOS = [
 // Brand strip + trust items
 // ---------------------------------------------------------------------------
 export const BRANDS = [
-  "Classmate",
-  "Navneet",
-  "DOMS",
-  "Camlin",
-  "Apsara",
-  "Nataraj",
-  "Cello",
-  "Reynolds",
-  "Faber-Castell",
-  "Kangaro",
+  { name: "Classmate", logoDomain: "classmateshop.com" },
+  { name: "Navneet", logoDomain: "navneet.com" },
+  { name: "DOMS", logoDomain: "domsindia.com" },
+  { name: "Camlin", logoDomain: "kokuyocamlin.com" },
+  { name: "Apsara", logoDomain: "hindustanpencils.com" },
+  { name: "Nataraj", logoDomain: "hindustanpencils.com" },
+  { name: "Cello", logoDomain: "celloworld.com" },
+  { name: "Reynolds", logoDomain: "reynolds.com" },
+  { name: "Faber-Castell", logoDomain: "faber-castell.com" },
+  { name: "Kangaro", logoDomain: "kangaro.com" },
 ];
 
 // Shown when a product has no photo yet (owner-added items) — never pass an empty src.
