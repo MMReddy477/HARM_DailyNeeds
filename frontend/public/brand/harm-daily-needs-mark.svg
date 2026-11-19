@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">H.A.R.M Daily Needs mark</title>
+  <path d="M42 43V32c0-9 6-15 15-15h14c9 0 15 6 15 15v11" fill="none" stroke="#0F3D91" stroke-linecap="round" stroke-width="5"/>
+  <path d="M17 43h94l-7 68c-.5 5-4 8-9 8H33c-5 0-8.5-3-9-8z" fill="#FFFFFF" stroke="#0F3D91" stroke-linejoin="round" stroke-width="5"/>
+  <path d="M34 61l7-4 9 42-7 4z" fill="#0F3D91"/>
+  <path d="M33 61l7-4 2 7-7 4z" fill="#D4AF37"/>
+  <path d="M60 66v30m-20-15h20" fill="none" stroke="#0F3D91" stroke-linecap="round" stroke-width="6"/>
+  <path d="M83 58c-8 11-17 19-17 29a19 19 0 0 0 38 0c0-10-9-18-17-29l-2-3z" fill="#2E7D32"/>
+  <path d="M84 76l-9 21h7l2-5h7l2 5h7l-9-21zm1 10 2-4 2 4z" fill="#FFFFFF" fill-rule="evenodd"/>
+  <path d="M32 107h64" fill="none" stroke="#D4AF37" stroke-linecap="round" stroke-width="2"/>
+</svg>

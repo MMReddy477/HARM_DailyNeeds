@@ -150,9 +150,7 @@ export default function NavBar() {
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4">
         <Link to="/" data-testid="nav-logo-link" className="flex shrink-0 items-center gap-2.5">
-          <span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-700 to-purple-950 font-heading text-lg font-extrabold text-white shadow-md">
-            H
-          </span>
+          <img src="/brand/harm-daily-needs-mark.svg" alt="" className="size-10 shrink-0" />
           <span className="leading-tight">
             <span className="block font-heading text-[15px] font-extrabold tracking-tight text-purple-950">
               H.A.R.M DAILY NEEDS

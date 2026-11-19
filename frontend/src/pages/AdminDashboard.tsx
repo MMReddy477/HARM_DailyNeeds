@@ -98,7 +98,7 @@ export default function AdminDashboard() {
 
   const brand = (
     <div className="flex items-center gap-3 px-6 py-5">
-      <span className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#6D28D9] to-[#3B0764] text-lg font-extrabold text-white">H</span>
+      <img src="/brand/harm-daily-needs-mark.svg" alt="" className="size-11 shrink-0" />
       <div className="leading-tight"><p className="font-extrabold text-[#111827]">H.A.R.M DAILY NEEDS</p><p className="text-xs font-semibold uppercase tracking-wider text-[#6D28D9]">Owner Admin</p></div>
     </div>
   );

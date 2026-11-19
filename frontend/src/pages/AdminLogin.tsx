@@ -37,7 +37,7 @@ export default function AdminLogin() {
         />
         <div className="relative flex h-full flex-col justify-between p-12 text-white">
           <div className="flex items-center gap-2.5">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-purple-900 font-heading text-lg font-extrabold">H</span>
+            <img src="/brand/harm-daily-needs-mark.svg" alt="" className="size-10 shrink-0" />
             <span className="font-heading text-base font-extrabold">H.A.R.M DAILY NEEDS</span>
           </div>
           <div>

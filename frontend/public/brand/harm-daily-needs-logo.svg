@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 360" role="img" aria-labelledby="title description">
+  <title id="title">H.A.R.M Daily Needs</title>
+  <desc id="description">A navy shopping bag frames a fountain-pen H and green milk-drop A, with the tagline Daily Needs, Dairy, Stationery.</desc>
+  <rect width="1000" height="360" fill="#FFFFFF"/>
+  <g fill="none" stroke="#0F3D91" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M354 120V91c0-31 22-53 53-53h186c31 0 53 22 53 53v29" stroke-width="7"/>
+    <path d="M120 112h760l-38 196H158z" stroke-width="7"/>
+  </g>
+  <path d="M220 145l18-9 13 72-17 10z" fill="#0F3D91"/>
+  <path d="M219 145l18-9 4 11-19 9z" fill="#D4AF37"/>
+  <path d="M286 155v48m-48-24h48" fill="none" stroke="#0F3D91" stroke-linecap="round" stroke-width="12"/>
+  <path d="M378 132c-13 18-31 35-31 53a36 36 0 0 0 72 0c0-18-18-35-31-53l-5-7z" fill="#2E7D32"/>
+  <path d="M383 158l-19 44h12l4-11h16l4 11h12l-19-44zm2 22 3-9 4 9z" fill="#FFFFFF" fill-rule="evenodd"/>
+  <circle cx="322" cy="199" r="5" fill="#D4AF37"/>
+  <circle cx="432" cy="199" r="5" fill="#D4AF37"/>
+  <text x="452" y="214" fill="#0F3D91" font-family="Arial, Helvetica, sans-serif" font-size="84" font-weight="700" letter-spacing="3">R.M</text>
+  <path d="M418 241h164" fill="none" stroke="#D4AF37" stroke-linecap="round" stroke-width="3"/>
+  <text x="500" y="269" fill="#0F3D91" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" letter-spacing="7" text-anchor="middle">DAILY NEEDS</text>
+  <text x="500" y="294" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="600" letter-spacing="2.3" text-anchor="middle">
+    <tspan fill="#0F3D91">DAILY NEEDS</tspan>
+    <tspan fill="#D4AF37"> | </tspan>
+    <tspan fill="#2E7D32">DAIRY</tspan>
+    <tspan fill="#D4AF37"> | </tspan>
+    <tspan fill="#0F3D91">STATIONERY</tspan>
+  </text>
+</svg>

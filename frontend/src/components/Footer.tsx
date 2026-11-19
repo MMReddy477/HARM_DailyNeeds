@@ -9,9 +9,7 @@ export default function Footer() {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:grid-cols-2 lg:grid-cols-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-purple-900 font-heading text-lg font-extrabold text-white">
-              H
-            </span>
+            <img src="/brand/harm-daily-needs-mark.svg" alt="" className="size-10 shrink-0" />
             <span className="font-heading text-base font-extrabold text-white">H.A.R.M DAILY NEEDS</span>
           </div>
           <p className="mt-3 text-sm leading-relaxed text-slate-300">{STORE.tagline}</p>
